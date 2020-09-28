@@ -21,7 +21,7 @@ const signout = ({ commit }) => {
     localStorage.removeItem(USER_KEY)
     commit('addUser', {})
     commit('pullLists', [])
-    router.go({ name: "Login" })
+    router.ṕush({ path: "/auth" })
 }
 
 const notify = ({ commit }, info) => {

@@ -42,7 +42,7 @@
       <v-window-item :value="1">
         <v-card-text class="text-info">
           <div>{{list.description}}</div>
-          <div class="text-right">Iniciada em: {{list.startDate | format-date }}</div>
+          <div class="text-right">Iniciada em: {{list.startDate}}</div>
         </v-card-text>
       </v-window-item>
 

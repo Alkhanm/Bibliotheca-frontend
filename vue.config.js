@@ -5,5 +5,4 @@ module.exports = {
   "transpileDependencies": [
     "vuetify"
   ],
-  publicPath: '/libros'
 }

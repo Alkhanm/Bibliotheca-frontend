@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import { validateLogin, validateRoutes } from './util/login'
+//import { validateLogin, validateRoutes } from './util/login'
 
 import NewBook from '@/components/book/NewBook.vue'
 import Library from '@/components/book/Library.vue'
@@ -17,7 +17,7 @@ const router = new VueRouter({
       path: '/auth',
       name: 'Login',
       component: Auth,
-      beforeEnter: validateLogin
+      //beforeEnter: validateLogin
     },
     {
       path: '/menu',
@@ -36,13 +36,9 @@ const router = new VueRouter({
       component: Library,
       props: true
     },
-    {
-      path: '*',
-      redirect: "/menu"
-    }
   ]
 })
 
-router.beforeEach(validateRoutes)
+//router.beforeEach(validateRoutes)
 
 export default router

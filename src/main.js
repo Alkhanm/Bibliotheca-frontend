@@ -21,9 +21,7 @@ firebase.initializeApp({
 })
 
 Vue.config.productionTip = false
-Vue.filter("format-date", (a) => {
-  return a.split(" ").join(" ás ")
-})
+
 new Vue({
   router,
   store,

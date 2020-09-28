@@ -10,8 +10,7 @@ const http = axios.create({
 
 http.interceptors.request.use(async (response) => {
     const token = store.state.user.token
-    if (token)
-        response.headers.Authorization = `Bearer ${token}`
+    if (token) response.headers.Authorization = `Bearer ${token}`
     return response
 })
 function success(s) {
@@ -28,7 +27,7 @@ function error(e) {
     const statusCode = e.response.status
     if (statusCode === 403 && router.currentRoute.name !== 'Auth') {
         store.dispatch("signout")
-        router.go({ name: 'Login' })
+        router.push({name: "Login"})
         return Promise.reject(e)
     }
     //Faz o commit desse erro para ser apresentado no frontend
