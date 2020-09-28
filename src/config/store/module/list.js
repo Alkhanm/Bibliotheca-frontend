@@ -18,18 +18,22 @@ export default {
         }
     },
     actions: {
-        async fetchList({commit}){
-            const response = await http.get(LIST.URL)
+        async fetchList({commit, dispatch}){
+           try { 
+               const response = await http.get(LIST.URL)
             const lists = response.data
             commit("pullLists", lists)
+        } catch (err){
+            dispatch("notify", err)
+        }
         },
         async saveList({commit, dispatch}, list){
            try {
-                const newList = await http.post(LIST.URL, list)
+                const response = await http.post(LIST.URL, list)
+                const newList = response.data
                 commit("addList", newList)
            } catch (error) {
                dispatch("notify", {...error, type: "error", time: 5000})
-               console.error(error)
            }
         }
     },

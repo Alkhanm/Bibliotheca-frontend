@@ -6,6 +6,7 @@ export default {
     state: {
         id: 0,
         username: "",
+        email: "",
         token: ""
     },
     mutations: {

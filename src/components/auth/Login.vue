@@ -26,19 +26,11 @@
   </v-form>
 </template>
 <script>
-import { mapActions } from "vuex";
+import { mapActions } from 'vuex';
 export default {
   name: "Auth",
-  data() {
-    return {
-      showPswd: false,
-      user: {},
-      isRegisterdUser: true,
-    };
-  },
-  methods: {
-    ...mapActions(["signin"]),
-  },
+  data: () => ({showPswd: false, user: {}}),
+  methods: mapActions(["signin"]),
 };
 </script>
 

@@ -94,7 +94,7 @@ export default {
     ...mapActions(["deleteList"]),
     newAuthor() {
       this.author.list = this.list;
-      this.$store.dispatch("createAuthor", this.author);
+      this.$store.dispatch("saveAuthor", this.author);
       this.addAuthor = false;
       this.author = {};
     },

@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-//import { validateLogin, validateRoutes } from './util/login'
-
 import NewBook from '@/components/book/NewBook.vue'
 import Library from '@/components/book/Library.vue'
 import Menu from '@/components/Menu.vue'
 import Auth from '@/components/auth/Auth.vue'
+import { validRouteLogin, validRoutes } from './util/validRoutes'
 
 Vue.use(VueRouter)
+
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
@@ -17,7 +17,7 @@ const router = new VueRouter({
       path: '/auth',
       name: 'Login',
       component: Auth,
-      //beforeEnter: validateLogin
+      beforeEnter: validRouteLogin
     },
     {
       path: '/menu',
@@ -36,9 +36,13 @@ const router = new VueRouter({
       component: Library,
       props: true
     },
+    {
+      path: "*",
+      redirect:"/menu"
+    }
   ]
 })
 
-//router.beforeEach(validateRoutes)
+router.beforeEach(validRoutes)
 
 export default router

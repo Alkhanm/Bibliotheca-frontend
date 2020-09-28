@@ -2,6 +2,7 @@ import axios from 'axios'
 import router from '@/config/router/index'
 import store from '@/config/store/index'
 
+import { USER_KEY } from "@/global"
 import { BASE } from '@/config/api/url.js'
 
 const http = axios.create({
@@ -9,8 +10,8 @@ const http = axios.create({
 })
 
 http.interceptors.request.use(async (response) => {
-    const token = store.state.user.token
-    if (token) response.headers.Authorization = `Bearer ${token}`
+    const user = JSON.parse(localStorage.getItem(USER_KEY))
+    if (user) response.headers.Authorization = `Bearer ${user.token}`
     return response
 })
 function success(s) {

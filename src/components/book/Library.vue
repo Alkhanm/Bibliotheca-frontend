@@ -203,7 +203,6 @@ export default {
   },
   async mounted() {
     await this.prepareReading();
-    this.loading = false;
   },
 };
 </script>
