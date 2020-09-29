@@ -5,6 +5,7 @@ import NewBook from '@/components/book/NewBook.vue'
 import Library from '@/components/book/Library.vue'
 import Menu from '@/components/Menu.vue'
 import Auth from '@/components/auth/Auth.vue'
+
 import { validRouteLogin, validRoutes } from './util/validRoutes'
 
 Vue.use(VueRouter)

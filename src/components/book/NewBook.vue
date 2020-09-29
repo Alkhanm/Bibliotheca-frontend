@@ -55,7 +55,6 @@
             </v-col>
           </v-row>
         </v-form>
-        <v-img :src="imgURL"></v-img>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -72,7 +71,6 @@ export default {
       dialog: false,
       loading: false,
       valid: false,
-      imgURL: "",
       book: {},
       ruleFile: [
         (v) =>
@@ -107,16 +105,18 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["uploadBook", "saveBook"]),
+    ...mapActions(["uploadBook", "saveBook", "uploadImg"]),
     async add() {
-      this.loading = true; //carregando...
+      this.loading = true;
       const book = this.getBook;
       if (book.file) {
-        book.imgURL = await this.getImgURL(book.file);
+        const imgDataURL = await this.getImgURL(book.file);
         await this.uploadBook(book);
+        await this.uploadImg({path: `${book.path}-img`, imgDataURL})
       }
       await this.saveBook(book); //espera a operação
       this.dialog = false;
+      this.loading = false;
     },
 
     async getImgURL(file) {
@@ -144,13 +144,11 @@ export default {
         canvasContext: context,
         viewport: viewport,
       };
-
       const renderTask = page.render(renderContext);
-
       await renderTask.promise;
-
-      return canvas.toDataURL("image/jpeg", 1.0);
+      return canvas.toDataURL("image/jpeg", 7.0);
     },
+    
   },
 };
 </script>

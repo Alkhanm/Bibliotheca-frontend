@@ -12,17 +12,17 @@
         <v-img
           v-else
           max-width="20%"
-          :src="book.imgURL"
+          :src="urlImg"
           alt="Imagem do livro"
         />
-        <div class="text-right ml-5">
+        <div class="text-end ml-5">
           {{ book.author.list.name }}
           <p>{{ categories }}</p>
           <p>{{ book.about }}</p>
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-btn @click="openBook = true" :disabled="loading">ler</v-btn>
+        <v-btn @click="openBook = true" :disabled="loading || !hasPDF">ler</v-btn>
         <v-spacer></v-spacer>
         <v-btn @click="deleteBook(book)">delete</v-btn>
       </v-card-actions>
@@ -91,7 +91,8 @@ export default {
     slider: 1,
     scale: 2.5,
     pageNum: 1,
-    url: "",
+    urlPdf: "",
+    urlImg: "",
     loading: true,
     pageRendering: false,
     showBottom: window.screen.height > 500 ? true : false,
@@ -100,12 +101,15 @@ export default {
     ...mapGetters(["getBookById"]),
     book() {
       const id = this.$route.params.id;
-      const book = this.getBookById(id);
-      return book;
+      return this.getBookById(id);
+    },
+    hasPDF(){
+      return !!this.book.path
     },
     categories() {
       const cat = this.book.author.list.categories;
-      if (cat.length) return cat.reduce((acc, att) => acc.concat(", ", att));
+      if (cat.length) 
+        return cat.reduce((acc, att) => acc.concat(", ", att));
       return "";
     },
   },
@@ -138,7 +142,7 @@ export default {
       pdfjsLib.GlobalWorkerOptions.workerSrc =
         "//mozilla.github.io/pdf.js/build/pdf.worker.js";
       // eslint-disable-next-line no-undef
-      const pdf = await pdfjsLib.getDocument(this.url).promise;
+      const pdf = await pdfjsLib.getDocument(this.urlPdf).promise;
       this.pdf = pdf;
     },
     async renderPage(num) {
@@ -172,13 +176,14 @@ export default {
     },
     async prepareReading() {
       if (!this.book) this.$router.push({ name: "Listas" });
-      if (this.book.path) {
-        this.url = await this.downloadBook(this.book);
+      if (this.hasPDF) {
         this.pageNum = this.book.currentPage;
         this.slider = this.book.currentPage;
+        const urls = await this.downloadBook(this.book);
+        this.urlPdf = urls.pdf
+        this.urlImg = urls.img
         await this.render();
         await this.renderPage(this.pageNum);
-        this.loading = false;
       }
     },
     showBottomOnScroll() {
@@ -192,7 +197,7 @@ export default {
     },
     close() {
       this.openBook = false;
-      this.updatePage({ id: this.book.id, actualPage: this.pageNum });
+      this.updatePage({ id: this.book.id, currentPage: this.pageNum });
     },
   },
   watch: {
@@ -201,8 +206,9 @@ export default {
       await this.renderPage(val);
     },
   },
-  async mounted() {
+  async created() {
     await this.prepareReading();
+    this.loading = false;
   },
 };
 </script>

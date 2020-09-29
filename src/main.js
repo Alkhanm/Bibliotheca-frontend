@@ -7,6 +7,7 @@ import store from './config/store/index'
 import vuetify from './plugins/vuetify';
 
 import firebase from 'firebase/app'
+
 import 'firebase/storage'
 
 firebase.initializeApp({

@@ -8,7 +8,7 @@
             <v-icon>menu</v-icon>
           </v-btn>
         </template>
-        <v-btn @click="deleteList(list.id)" fab small>
+        <v-btn @click="deleteList(list)" fab small>
           <v-icon color="red">mdi-delete</v-icon>
         </v-btn>
         <v-btn fab small @click="addAuthor = true">

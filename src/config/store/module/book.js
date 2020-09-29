@@ -1,26 +1,21 @@
 import http from "@/config/api/axios"
 import {BOOK} from "@/config/api/url"
+import {storage} from "firebase/app"
+import qs from 'qs';
 
 export default {
-    state: {
-        arr: []
-    },
+    state: { arr: [] },
     mutations: {
-        addAllBooks(state, books){
-            state.arr.push(...books)
-        },
-        addBook(state, book){
-            state.arr.push(book)
-        }
+        addAllBooks(state, books){ state.arr.push(...books)},
+        addBook(state, book){ state.arr.push(book)}
     },
     actions: {
         async fetchBooks({commit, dispatch}, { id }){
             try {
                 const response = await http.get(BOOK.URL, {params: {author: id}})
                 const books = response.data
-                console.log(books)
                 commit("addAllBooks", books)
-            } catch (err){
+            } catch (err){ 
                 dispatch("notify", {...err, time: 5000})
             }
         },
@@ -32,10 +27,42 @@ export default {
             } catch (err){
                 dispatch("notify", {...err, time: 5000})
             }
-        }
+        },
+        updatePage(context, {id, currentPage}){
+            http.patch(`${BOOK.URL}/${id}`, qs.stringify({currentPage: currentPage}))
+        },
+        async uploadBook({dispatch}, {path, file}){
+            try { 
+                const ref = storage().ref()
+                const child = ref.child(path)
+                await child.put(file)}
+            catch(err){
+                dispatch("notify", {...err, message: "Erro ao fazer upload do arquivo", time:4000, type: "warning"})
+            }
+        },
+        uploadImg(context, {path, imgDataURL}){
+            try {
+                const ref = storage().ref()
+                const child = ref.child(path)
+                const dataUrl = imgDataURL.split(",")[1]
+                child.putString(dataUrl, "base64", {contentType: 'image/jpeg'})
+            } catch (err) {
+                console.error("Não foi possivel salvar um imagem deste livro.",err)
+            }
+        },
+        async downloadBook({dispatch}, {path}){
+            try {
+                const ref = storage().ref()
+                const pdf = await ref.child(path).getDownloadURL()
+                const img = await ref.child(path + "-img").getDownloadURL()
+                return { pdf, img }
+            } catch (err) {
+                dispatch("notify", {...err, message: "Erro ao fazer download do arquivo", time:4000, type: "warning"})
+            }
+        },
     },
     getters:{
-        getBooksByAuthor: (state) => (author) => state.arr.filter(book => book.author === author),
-        getBookById: (state) => (id) => state.arr.filter(book => book.id === id)
+        getBooksByAuthor: ({arr}) => ({id}) => arr.filter(book => book.author.id === id),
+        getBookById: ({arr}) => (id) => arr.find(book => book.id === id)
     }
 }

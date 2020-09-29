@@ -30,8 +30,7 @@ export default {
   },
   methods: mapActions(["fetchBooks"]),
   async mounted() {
-    const books = this.getBooksByAuthor(this.author);
-    if (!books.length) await this.fetchBooks(this.author);
+    if (!this.books.length) await this.fetchBooks(this.author);
   },
 };
 </script>

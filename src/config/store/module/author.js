@@ -5,12 +5,8 @@ export default {
         arr: []
     },
     mutations: {
-        addAllAuthors(state, authors){
-            state.arr.push(...authors)
-        },
-        addAuthor(state, author){
-            state.arr.push(author)
-        }
+        addAllAuthors(state, authors){ state.arr.push(...authors) },
+        addAuthor(state, author){ state.arr.push(author) }
     },
     actions: {
         async fetchAuthors({commit}, list){
@@ -25,8 +21,6 @@ export default {
         }
     },
     getters:{
-        getAuthorsByList: (state) => ({id}) => {
-            return state.arr.filter(author => author.list.id === id)
-        }
+        getAuthorsByList: ({arr}) => ({id}) => arr.filter(author => author.list.id === id)
     }
 }
