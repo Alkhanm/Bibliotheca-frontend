@@ -19,16 +19,14 @@
 
 <script>
 import Header from "./components/Header";
-import { USER_KEY } from "@/global";
+import { USER_KEY } from "./config/constants";
 export default {
   name: "app",
   components: { Header },
   computed: {
-    info() {
-      return this.$store.state.info;
-    },
+    info() { return this.$store.state.info },
   },
-  beforeCreate() {
+  created() {
     const userLocal = localStorage.getItem(USER_KEY);
     if (userLocal) this.$store.commit("addUser", JSON.parse(userLocal));
   },

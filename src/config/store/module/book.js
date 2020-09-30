@@ -1,6 +1,6 @@
-import http from "@/config/api/axios"
-import {BOOK} from "@/config/api/url"
-import {storage} from "firebase/app"
+import http from '@/config/services/api/axios'
+import {BOOK} from "@/config/services/api/url"
+import { deleteArchive } from "@/config/services/storage"
 import qs from 'qs';
 
 export default {
@@ -28,37 +28,17 @@ export default {
                 dispatch("notify", {...err, time: 5000})
             }
         },
+        async deleteBook({state, dispatch}, book ){
+            try {
+                await http.delete(`${BOOK.URL}/${book.id}`)
+                await deleteArchive(book)
+                state.arr.splice(state.arr.indexOf(book), 1)
+            } catch(err){
+                dispatch("notify", {...err, time: 5000})
+            }
+        },
         updatePage(context, {id, currentPage}){
             http.patch(`${BOOK.URL}/${id}`, qs.stringify({currentPage: currentPage}))
-        },
-        async uploadBook({dispatch}, {path, file}){
-            try { 
-                const ref = storage().ref()
-                const child = ref.child(path)
-                await child.put(file)}
-            catch(err){
-                dispatch("notify", {...err, message: "Erro ao fazer upload do arquivo", time:4000, type: "warning"})
-            }
-        },
-        uploadImg(context, {path, imgDataURL}){
-            try {
-                const ref = storage().ref()
-                const child = ref.child(path)
-                const dataUrl = imgDataURL.split(",")[1]
-                child.putString(dataUrl, "base64", {contentType: 'image/jpeg'})
-            } catch (err) {
-                console.error("Não foi possivel salvar um imagem deste livro.",err)
-            }
-        },
-        async downloadBook({dispatch}, {path}){
-            try {
-                const ref = storage().ref()
-                const pdf = await ref.child(path).getDownloadURL()
-                const img = await ref.child(path + "-img").getDownloadURL()
-                return { pdf, img }
-            } catch (err) {
-                dispatch("notify", {...err, message: "Erro ao fazer download do arquivo", time:4000, type: "warning"})
-            }
         },
     },
     getters:{

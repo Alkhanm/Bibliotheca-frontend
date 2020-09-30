@@ -1,5 +1,5 @@
-import http from "@/config/api/axios"
-import {LIST} from "@/config/api/url"
+import http from '@/config/services/api/axios'
+import {LIST} from"@/config/services/api/url"
 
 export default {
     state: { arr: [], create: false },
@@ -24,7 +24,6 @@ export default {
                 const newList = response.data
                 commit("addList", newList)
            } catch (err) {
-               console.log(err)
                dispatch("notify", {...err, time: 5000})
            }
         },

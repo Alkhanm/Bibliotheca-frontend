@@ -5,7 +5,7 @@
       <v-list-item-title>{{book.title}}</v-list-item-title>
       <v-btn :to="{name:'Livraria', params: {id: book.id} }">abrir</v-btn>
     </v-list-item>
-    <v-list-item v-if="!books.length">
+    <v-list-item v-if="!hasBooks">
       <v-list-item-content>
         <v-alert type="info" text>Por enquanto não há nada nesta lista.</v-alert>
       </v-list-item-content>
@@ -27,6 +27,9 @@ export default {
     books() {
       return this.getBooksByAuthor(this.author);
     },
+    hasBooks(){
+      return !!this.books.length
+    }
   },
   methods: mapActions(["fetchBooks"]),
   async mounted() {
@@ -34,6 +37,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

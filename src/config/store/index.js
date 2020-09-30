@@ -8,13 +8,12 @@ import list from './module/list'
 import author from './module/author'
 import book from './module/book'
 
-
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     showMenu: false,
-    info: ''
+    info: '',
   },
   mutations: {
     displayMenu(state, payload) {

@@ -1,5 +1,5 @@
-import http from "@/config/api/axios"
-import {AUTHOR} from "@/config/api/url"
+import http from '@/config/services/api/axios'
+import {AUTHOR} from "@/config/services/api/url"
 export default {
     state: {
         arr: []
@@ -18,6 +18,14 @@ export default {
             const response = await http.post(AUTHOR.URL, author)
             const newAuthor = response.data
             commit("addAuthor", newAuthor)
+        }, 
+        async deleteAuthor({state, dispatch}, author ){
+            try {
+                await http.delete(`${AUTHOR.URL}/${author.id}`)
+                state.arr.splice(state.arr.indexOf(author), 1)
+            } catch(err){
+                dispatch("notify", {...err, time: 5000})
+            }
         }
     },
     getters:{

@@ -1,13 +1,9 @@
 <template>
-  <v-list flat>
+  <v-list>
     <v-btn v-if="loading" block loading></v-btn>
-    <v-list-group prepend-icon="account_circle" v-for="author in authors" :key="author.id">
+    <v-list-group prepend-icon="account_circle" v-for="(author) in authors" :key="author.id">
       <template v-slot:activator>
-        <v-list-item>
-          <v-list-item-content>
-            <v-list-item-title v-text="author.name" />
-          </v-list-item-content>
-        </v-list-item>
+        <v-list-item-title v-text="author.name" />
       </template>
       <v-list-item class="actions">
         <NewBook :author="author"></NewBook>

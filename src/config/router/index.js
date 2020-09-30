@@ -2,11 +2,11 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import NewBook from '@/components/book/NewBook.vue'
-import Library from '@/components/book/Library.vue'
+import Library from '@/components/book/Library'
 import Menu from '@/components/Menu.vue'
 import Auth from '@/components/auth/Auth.vue'
 
-import { validRouteLogin, validRoutes } from './util/validRoutes'
+import { validRouteLogin, validRoutes } from '@/config/services/validRoutes'
 
 Vue.use(VueRouter)
 

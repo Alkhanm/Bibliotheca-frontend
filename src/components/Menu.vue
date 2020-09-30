@@ -44,7 +44,7 @@
 <script>
 import ReadingList from "@/components/list/ReadingList";
 import NewList from "@/components/list/NewList";
-import formatText from "@/config/util/replace";
+import formatText from "@/config/services/replace";
 export default {
   name: "Menu",
   components: { NewList, ReadingList },

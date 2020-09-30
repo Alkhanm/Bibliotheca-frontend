@@ -1,7 +1,7 @@
-import http from '@/config/api/axios'
+import http from '@/config/services/api/axios'
+import { AUTH } from "@/config/services/api/url"
+import { USER_KEY } from '@/config/constants'
 import router from "@/config/router/index"
-import { AUTH } from "@/config/api/url"
-import { USER_KEY } from '@/global'
 
 
 const signin = async ({ commit, dispatch }, payload) => {

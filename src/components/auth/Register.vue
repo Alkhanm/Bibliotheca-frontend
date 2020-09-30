@@ -78,18 +78,12 @@ export default {
   methods: {
     ...mapActions(["saveUser"]),
     async register() {
-      try {
         this.loading = true;
-        await this.saveUser(this.user);
-        this.$router.go({ name: "Login" });
+        const success = await this.saveUser(this.user);
         this.loading = false;
-      } catch (err) {
-        this.loading = false;
-      }
+        if (success) this.$emit("registred")
     },
   },
 };
 </script>
 
-<style>
-</style>

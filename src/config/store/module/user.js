@@ -1,6 +1,5 @@
-import http from "@/config/api/axios"
-import {USER} from "@/config/api/url"
-import {USER_KEY} from "@/global"
+import http from '@/config/services/api/axios'
+import {USER} from "@/config/services/api/url"
 
 export default {
     state: {
@@ -22,10 +21,10 @@ export default {
             try {  
                 const response = await http.post(USER.URL, user)
                 const newUser = response.data
-                localStorage.setItem(USER_KEY, JSON.stringify(newUser))
                 commit("addUser", newUser)
+                return true
             } catch(err){
-                dispatch("notify", {...err, time: 5000})
+                dispatch("notify", {...err.response.data, time: 5000})
           }
         }
     },

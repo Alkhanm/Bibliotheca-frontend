@@ -1,12 +1,12 @@
 <template>
   <v-container>
-    <v-card class="mx-auto mb-3" dark>
+    <v-card class="mx-auto mb-3" max-width="1000" dark>
       <v-container fluid>
         <template v-if="isRegistredUser">
-          <Login />
+          <Login  />
         </template>
         <template v-else>
-          <Register />
+          <Register @registred="isRegistredUser = true" />
         </template>
         <hr />
         <div class="text-center">
@@ -44,6 +44,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

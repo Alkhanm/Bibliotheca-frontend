@@ -62,6 +62,9 @@
 
 <script>
 import { mapActions } from "vuex";
+import { uploadBook, uploadImg } from "@/config/services/storage"
+import {renderPDF, renderPage} from "@/config/services/PdfService"
+import formatText from "@/config/services/replace";
 
 export default {
   name: "Upload",
@@ -91,9 +94,8 @@ export default {
       const list = author.list;
       const book = { ...this.book, author };
       if (book.file) {
-        const path = `${this.userId}/${list.name}/${author.name}/${book.title}`
-          .replaceAll(" ", "-")
-          .toLowerCase();
+        const concat = `${this.userId}/${list.name}/${author.name}/${book.title}`
+        const path = formatText(concat).replaceAll(" ", "-").toLowerCase();
         book.path = path;
       }
       return book;
@@ -105,49 +107,24 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["uploadBook", "saveBook", "uploadImg"]),
+    ...mapActions(["saveBook"]),
     async add() {
       this.loading = true;
       const book = this.getBook;
       if (book.file) {
-        const imgDataURL = await this.getImgURL(book.file);
-        await this.uploadBook(book);
-        await this.uploadImg({path: `${book.path}-img`, imgDataURL})
+        const imgDataURL = await this.getBookCover(book.file);
+        await uploadBook(book);
+        await uploadImg({path: `${book.path}-img`, imgDataURL})
       }
       await this.saveBook(book); //espera a operação
       this.dialog = false;
       this.loading = false;
     },
-
-    async getImgURL(file) {
-      // eslint-disable-next-line no-undef
-      const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
-      const page = await pdf.getPage(1);
-
-      const scales = { 1: 3.2, 2: 4 };
-      const defaultScale = 2;
-      const scale = scales[window.devicePixelRatio] || defaultScale;
-
-      const viewport = page.getViewport({ scale });
-
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-
-      const displayWidth = 1;
-      canvas.style.width = `${(viewport.width * displayWidth) / scale}px`;
-      canvas.style.height = `${(viewport.height * displayWidth) / scale}px`;
-
-      const renderContext = {
-        canvasContext: context,
-        viewport: viewport,
-      };
-      const renderTask = page.render(renderContext);
-      await renderTask.promise;
-      return canvas.toDataURL("image/jpeg", 7.0);
-    },
+    async getBookCover(file){
+      const pdf = await renderPDF(file)
+      const page = await renderPage(pdf, 1)
+      return page.toDataURL("img/jpeg", 0.5)
+    }
     
   },
 };
