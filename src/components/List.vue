@@ -11,9 +11,7 @@
         <v-btn @click="deleteList(list)" fab small>
           <v-icon color="red">mdi-delete</v-icon>
         </v-btn>
-        <v-btn fab small @click="addAuthor = true">
-          <v-icon color="green">mdi-plus</v-icon>
-        </v-btn>
+        <CollectionNew></CollectionNew>
       </v-speed-dial>
     </v-card-title>
     <v-card-subtitle>
@@ -23,21 +21,9 @@
         @click="searchFor(cat)"
         class="ml-1 mb-1"
         small
-        v-text="cat"
-      />
+        v-text="cat"/>
     </v-card-subtitle>
     <v-divider></v-divider>
-    <v-dialog v-model="addAuthor" max-width="800px">
-      <v-card dark>
-        <h3 class="mt-2 text-center">Adicionar autor</h3>
-        <v-card-actions class="ml-2 mr-2">
-          <v-text-field v-model="author.name" clearable autofocus label="Nome do autor" />
-          <v-btn @click="newAuthor()" class="ml-4" fab>
-            <v-icon color="green">add</v-icon>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <v-window v-model="step">
       <v-window-item :value="1">
         <v-card-text class="text-info">
@@ -45,10 +31,8 @@
           <div class="text-right">Iniciada em: {{list.startDate}}</div>
         </v-card-text>
       </v-window-item>
-
       <v-window-item :value="2">
         <v-spacer></v-spacer>
-
         <Authors :list="list"></Authors>
       </v-window-item>
     </v-window>
@@ -71,15 +55,14 @@
 
 <script>
 import Authors from "@/components/Authors";
+import CollectionNew from "./CollectionNew"
 import { mapActions } from "vuex";
 
 export default {
   name: "Section",
-  components: { Authors },
+  components: { Authors, CollectionNew },
   props: { list: { type: Object, requerid: true } },
   data: () => ({
-    addAuthor: false,
-    author: {},
     showActionsPanel: false,
     step: 1,
   }),
@@ -91,12 +74,6 @@ export default {
   },
   methods: {
     ...mapActions(["deleteList"]),
-    newAuthor() {
-      this.author.list = this.list;
-      this.$store.dispatch("saveAuthor", this.author);
-      this.addAuthor = false;
-      this.author = {};
-    },
     searchFor(cat) {
       this.$emit("searchFor", cat);
     },

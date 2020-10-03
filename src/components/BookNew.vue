@@ -15,7 +15,6 @@
         <p class="headline text-center">Novo Livro</p>
       </v-card-title>
       <v-card-text>
-        <v-form>
           <v-text-field
             v-model="book.title"
             autofocus
@@ -51,7 +50,6 @@
                 </v-btn>
             </v-col>
           </v-row>
-        </v-form>
       </v-card-text>
     </v-card>
   </v-dialog>

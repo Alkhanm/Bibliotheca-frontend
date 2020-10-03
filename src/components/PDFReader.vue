@@ -77,7 +77,7 @@ export default {
     ...mapActions(["updatePage"]), 
     ...mapMutations(["openBook"]),
     increase() {
-      this.scale = this.scale + 0.05;
+      this.scale = this.scale + 0.55;
       if (!this.pageRendering) this.getPage(this.pageNum);
     },
     decrease() {
@@ -87,7 +87,8 @@ export default {
     prev() { if (this.pageNum > 1) this.pageNum--;},
     next() { if (this.pageNum < this.totalPages) this.pageNum++; },
     touchesMoves(event){
-      const percent =  (screen.height / 100) * 30
+      event.preventDefault()
+      const percent =  (screen.height / 100) * 40
       const firstTouch = this.firstTouch.touches[0].clientY
       const lastTouch = event.changedTouches[0].clientY
       const movementDown = firstTouch - lastTouch
@@ -97,9 +98,6 @@ export default {
       const container = document.getElementById("canvas-container");    
       if (movementUp >= percent && firstTouch <= lastTouch && container.scrollTop === 0)
         return this.prev()
-    },
-    test(event){
-      console.log(event)
     },
     async getPage(num){
       try {
@@ -127,12 +125,14 @@ export default {
       //Para telas pequenas, a barra se opções será oculta na navegação
       if (top > 0 && top < topMax && screen.height < 1000) this.showBottom = false;
       //Ao chegar no fim da página, mostre a barra
-      if (top >= (topMax - 50)) this.showBottom = true;
+      if (top === 0 || top >= (topMax - 50)) this.showBottom = true;
     }, 
     close() {
       this.openBook(false)
-      this.book.currentPage = this.pageNum
-      this.updatePage({ id: this.book.id, currentPage: this.pageNum });
+      const id = this.book.id
+      const currentPage = this.pageNum
+      const lastReading = Date.now()
+      this.updatePage({id, currentPage, lastReading});
     },
   },
   watch: {
@@ -153,10 +153,8 @@ export default {
 </script>
 
 <style>
-#content { display: flex; justify-content: space-between; }
 #space-between{ height: 50px;}
 .page-count { display: flex; width: 100%; }
-.text-content{ flex: 1; }
 .image-book{ cursor: pointer; }
 @media (max-width: 600px) {
  .counter { display: none !important; }

@@ -56,17 +56,15 @@ export default {
     lists() { return this.$store.state.list.arr; },
     filtredList() {
       const search = formatText(this.search);
-      if (search) {
-        const filter = this.lists.filter((list) => {
-          const name = formatText(list.name);
-          const categories = list.categories.filter((c) =>
-            formatText(c).includes(search)
-          );
-          return name.includes(search) || categories.length;
-        });
-        return filter;
-      }
-      return this.lists;
+      if (!search) return this.lists;
+      const filter = this.lists.filter((list) => {
+        const name = formatText(list.name);
+        const categories = list.categories.filter((c) =>
+          formatText(c).includes(search)
+        );
+        return name.includes(search) || categories.length;
+      });
+      return filter;
     },
   },
   methods: {

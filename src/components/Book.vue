@@ -24,11 +24,14 @@
           :book="book" 
           :pdfURL="pdfURL"></PDFReader>
         </template>
-        <div class="text-content text-end ml-5">
-          <span>Lista: {{ book.author.list.name }}</span>
-          <p>Categorias: {{ categories }}</p>
-          <p class="text-start">{{ book.about }}</p>
-        </div>
+        <p id="text-about-book" class="text-start pl-5 pr-5">
+          {{book.about}}
+        </p>
+        <span class="text-end">
+          <div>Lista: {{ book.author.list.name }}</div>
+          <div>Categorias: {{ categories }}</div>
+          <div>Última leitura: {{ book.lastReading }}</div>
+        </span>
     </v-card-text>
     <v-btn @click="$router.back()" text min-width="13%">
       <v-icon>keyboard_return</v-icon>
@@ -77,3 +80,13 @@ export default {
   }
 };
 </script>
+<style>
+#content { display: flex; justify-content: space-between; }
+.text-content{
+  display: flex;
+}
+#text-about-book {
+  flex:1;
+}
+.image-book{ cursor: pointer; }
+</style>

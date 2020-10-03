@@ -25,7 +25,7 @@ export default new Vuex.Store({
     },
     openBook(state, payload){
       state.open = payload
-    }
+    },
   },
   actions,
   modules: {
