@@ -2,7 +2,7 @@ import http from "./api/axios"
 
 import { AUTH } from "./api/url"
 
-import {USER_KEY} from "@/config/constants"
+import {USER_KEY} from "@/services/constants"
 
 
 const user = JSON.parse(localStorage.getItem(USER_KEY))

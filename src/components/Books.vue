@@ -3,7 +3,7 @@
     <v-list-item v-for="book in books" :key="book.id" active-class sub-group>
       <v-icon class="pa-2">book</v-icon>
       <v-list-item-title>{{book.title}}</v-list-item-title>
-      <v-btn :to="{name:'Livraria', params: {id: book.id} }">abrir</v-btn>
+      <v-btn :to="{name:'Leitura', params: {id: book.id} }">abrir</v-btn>
     </v-list-item>
     <v-list-item v-if="!hasBooks">
       <v-list-item-content>
@@ -17,7 +17,7 @@
 import { mapActions, mapGetters } from "vuex";
 
 export default {
-  name: "ListBook",
+  name: "Books",
   props: {
     author: { type: Object, required: true },
   },

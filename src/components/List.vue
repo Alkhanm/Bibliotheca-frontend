@@ -49,7 +49,7 @@
       <v-window-item :value="2">
         <v-spacer></v-spacer>
 
-        <ListAuthor :list="list"></ListAuthor>
+        <Authors :list="list"></Authors>
       </v-window-item>
     </v-window>
 
@@ -69,14 +69,13 @@
   </v-card>
 </template>
 
-
 <script>
-import ListAuthor from "@/components/author/ListAuthor";
+import Authors from "@/components/Authors";
 import { mapActions } from "vuex";
 
 export default {
   name: "Section",
-  components: { ListAuthor },
+  components: { Authors },
   props: { list: { type: Object, requerid: true } },
   data: () => ({
     addAuthor: false,

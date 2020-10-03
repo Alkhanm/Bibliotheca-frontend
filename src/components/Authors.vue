@@ -6,13 +6,13 @@
         <v-list-item-title v-text="author.name" />
       </template>
       <v-list-item class="actions">
-        <NewBook :author="author"></NewBook>
+        <BookNew :author="author"></BookNew>
         <v-spacer></v-spacer>
         <v-btn @click="deleteAuthor(author)" small fab class="ml-3 grey darken-3">
           <v-icon color="red">delete</v-icon>
         </v-btn>
       </v-list-item>
-      <ListBook :author="author"></ListBook>
+      <Books :author="author"></Books>
     </v-list-group>
     <v-list-item v-if="!authors.length">
       <v-list-item-content>
@@ -23,13 +23,13 @@
 </template>
 
 <script>
-import ListBook from "@/components/book/ListBook";
+import Books from "@/components/Books";
+import BookNew from "@/components/BookNew";
 import { mapActions, mapGetters } from "vuex";
-import NewBook from "@/components/book/NewBook";
 
 export default {
   name: "ListAuthor",
-  components: { ListBook, NewBook },
+  components: { Books, BookNew },
   props: { list: { type: Object, required: true } },
   data: () => ({ loading: true }),
   computed: {

@@ -1,16 +1,13 @@
 import axios from 'axios'
-import router from '@/config/router/index'
-import store from '@/config/store/index'
+import router from '@/router/index'
+import store from '@/store/index'
 
-import { USER_KEY } from "@/config/constants"
-
+import { USER_KEY } from "@/services/constants"
 import { BASE } from './url.js'
 
-const http = axios.create({
-    baseURL: BASE
-})
+const http = axios.create({ baseURL: BASE })
 
-http.interceptors.request.use(async (response) => {
+http.interceptors.request.use((response) => {
     const user = JSON.parse(localStorage.getItem(USER_KEY))
     if (user) response.headers.Authorization = `Bearer ${user.token}`
     return response

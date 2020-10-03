@@ -6,8 +6,7 @@
         v-on="on"
         fab
         small
-        color="grey darken-3 text-lowercase"
-      >
+        color="grey darken-3 text-lowercase">
         <v-icon color="success">mdi-plus</v-icon>
       </v-btn>
     </template>
@@ -21,9 +20,7 @@
             v-model="book.title"
             autofocus
             label="Título"
-            hint="Informe o título deste livro. Se vazio, o nome do arquivo será usado."
-          />
-
+            hint="Informe o título deste livro. Se vazio, o nome do arquivo será usado."/>
           <!-- Upload do livro -->
           <v-file-input
             class="mb-4"
@@ -32,8 +29,8 @@
             label="Incluir arquivo"
             :rules="ruleFile"
             hint="Selecione o livro a ser salvo."
-            persistent-hint
-          ></v-file-input>
+            persistent-hint>
+          </v-file-input>
           <v-row>
             <v-col cols="12" sm="6">
               <v-btn
@@ -41,17 +38,17 @@
                 :loading="loading"
                 :disabled="!isValid"
                 block
-                class="grey darken-3"
-                >Salvar</v-btn
-              >
+                class="grey darken-3">
+                Salvar
+                </v-btn>
             </v-col>
             <v-col>
               <v-btn
                 @click="(dialog = false), (book = {}), (loading = false)"
                 block
-                class="grey darken-3"
-                >Fechar</v-btn
-              >
+                class="grey darken-3">
+                Fechar
+                </v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -62,15 +59,14 @@
 
 <script>
 import { mapActions } from "vuex";
-import { uploadBook, uploadImg } from "@/config/services/storage"
-import {renderPDF, renderPage} from "@/config/services/PdfService"
-import formatText from "@/config/services/replace";
+import { uploadBook, uploadImg } from "@/services/storage"
+import {renderPDF, renderPage} from "@/services/PdfService"
+import formatText from "@/services/replace";
 
 export default {
-  name: "Upload",
+  name: "BookNew",
   props: { author: Object },
-  data() {
-    return {
+  data: () => ({ 
       dialog: false,
       loading: false,
       valid: false,
@@ -83,8 +79,7 @@ export default {
           (!!v && v.size < 15728640) ||
           "Ainda não é possivel salvar arquivos tão grandes.",
       ],
-    };
-  },
+  }),
   computed: {
     userId() {
       return this.$store.state.user.id;

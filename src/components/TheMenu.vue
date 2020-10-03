@@ -1,5 +1,6 @@
 <template>
   <v-container fluid>
+    <BookLatest></BookLatest>
     <v-card max-width="1000px" class="grey darken-2 mx-auto">
       <v-card dark>
         <v-card-actions>
@@ -25,14 +26,14 @@
           </span>
         </v-card-text>
       </v-card>
-      <NewList v-show="create" />
-      <ReadingList
+      <ListNew v-show="create"> </ListNew>
+      <List
         @searchFor="search = $event"
         v-for="list in filtredList"
         :key="list.id"
         :list="list"
-        class="mt-7"
-      />
+        class="mt-7"> 
+      </List>
     </v-card>
     <v-alert class="mt-4" v-show="!lists.length" text type="info">
       Nenhuma lista salva.
@@ -42,24 +43,17 @@
 </template>
 
 <script>
-import ReadingList from "@/components/list/ReadingList";
-import NewList from "@/components/list/NewList";
-import formatText from "@/config/services/replace";
+import List from "@/components/List";
+import ListNew from "@/components/ListNew";
+import BookLatest from "./BooksLatest"
+import formatText from "@/services/replace";
 export default {
   name: "Menu",
-  components: { NewList, ReadingList },
-  data() {
-    return {
-      search: "",
-    };
-  },
+  components: { ListNew, List, BookLatest },
+  data:() => ({ search: "", }),
   computed: {
-    create() {
-      return this.$store.state.list.create;
-    },
-    lists() {
-      return this.$store.state.list.arr;
-    },
+    create() { return this.$store.state.list.create; },
+    lists() { return this.$store.state.list.arr; },
     filtredList() {
       const search = formatText(this.search);
       if (search) {

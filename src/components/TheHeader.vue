@@ -15,10 +15,9 @@
   </div>
 </template>
 <script>
-/* eslint-disable vue/no-unused-components */
 import { mapMutations, mapActions, mapGetters } from "vuex";
 export default {
-  name: "Header",
+  name: "TheHeader",
   props: ["page"],
   computed: {
     ...mapGetters(["getUsername"]),

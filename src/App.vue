@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <Header />
+    <TheHeader />
     <v-main id="app-main">
       <router-view></router-view>
     </v-main>
@@ -18,11 +18,11 @@
 </template>
 
 <script>
-import Header from "./components/Header";
-import { USER_KEY } from "./config/constants";
+import TheHeader from "./components/TheHeader";
+import { USER_KEY } from "./services/constants";
 export default {
   name: "app",
-  components: { Header },
+  components: { TheHeader },
   computed: {
     info() { return this.$store.state.info },
   },

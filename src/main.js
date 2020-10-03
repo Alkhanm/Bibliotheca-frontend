@@ -2,8 +2,8 @@ import 'mutationobserver-shim'
 import Vue from 'vue'
 import App from './App.vue'
 
-import router from './config/router/index'
-import store from './config/store/index'
+import router from './router/index'
+import store from './store/index'
 import vuetify from './plugins/vuetify';
 
 import firebase from 'firebase/app'

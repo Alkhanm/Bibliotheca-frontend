@@ -3,10 +3,10 @@
     <v-card class="mx-auto mb-3" max-width="1000" dark>
       <v-container fluid>
         <template v-if="isRegistredUser">
-          <Login  />
+          <AuthenticationLogin />
         </template>
         <template v-else>
-          <Register @registred="isRegistredUser = true" />
+          <AuthenticationRegister @registred="isRegistredUser = true" />
         </template>
         <hr />
         <div class="text-center">
@@ -18,11 +18,11 @@
 </template>
 
 <script>
-import Login from "./Login";
-import Register from "./Register";
+import AuthenticationLogin from "./AuthenticationLogin";
+import AuthenticationRegister from "./AuthenticationRegister";
 export default {
   name: "Auth",
-  components: { Login, Register },
+  components: { AuthenticationLogin, AuthenticationRegister },
   data() {
     return {
       isRegistredUser: true,

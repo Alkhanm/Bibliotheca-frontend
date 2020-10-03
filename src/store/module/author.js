@@ -1,5 +1,5 @@
-import http from '@/config/services/api/axios'
-import {AUTHOR} from "@/config/services/api/url"
+import http from '@/services/api/axios'
+import {AUTHOR} from "@/services/api/url"
 export default {
     state: {
         arr: []

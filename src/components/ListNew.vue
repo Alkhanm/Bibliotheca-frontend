@@ -19,8 +19,7 @@
           label="Categorias (opcional)"
           hint="Após digitar aperte enter para confirmar ou selecione alguma das opções predefinidas."
           multiple
-          prepend-icon="filter_list"
-        >
+          prepend-icon="filter_list" >
           <template v-slot:selection="{ attrs, item, select, selected }">
             <v-chip
               v-bind="attrs"
@@ -44,7 +43,7 @@
           <v-textarea
             v-model="list.description"
             v-show="addDescription"
-            autofocus
+            autofocus 
             auto-grow
             rows="1"
             row-height="2"
@@ -69,7 +68,7 @@
 <script>
 import { mapActions } from "vuex";
 export default {
-  name: "NewList",
+  name: "ListNew",
   data() {
     return {
       list: {},

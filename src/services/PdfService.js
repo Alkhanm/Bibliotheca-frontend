@@ -1,6 +1,5 @@
 // eslint-disable-next-line no-undef
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "//mozilla.github.io/pdf.js/build/pdf.worker.js";
+pdfjsLib.GlobalWorkerOptions.workerSrc = "//mozilla.github.io/pdf.js/build/pdf.worker.js";
 
 export async function renderPDF(urlPDF) {
   const url = urlPDF.constructor.name === "String" ? urlPDF :

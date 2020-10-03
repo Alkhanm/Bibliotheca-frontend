@@ -29,7 +29,7 @@
 import { mapActions } from 'vuex';
 export default {
   name: "Auth",
-  data: () => ({showPswd: false, user: {}}),
+  data: () => ({ showPswd: false, user: {}}),
   methods: mapActions(["signin"]),
 };
 </script>

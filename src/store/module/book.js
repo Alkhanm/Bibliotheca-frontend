@@ -1,6 +1,6 @@
-import http from '@/config/services/api/axios'
-import {BOOK} from "@/config/services/api/url"
-import { deleteArchive } from "@/config/services/storage"
+import http from '@/services/api/axios'
+import {BOOK} from "@/services/api/url"
+import { deleteArchive } from "@/services/storage"
 import qs from 'qs';
 
 export default {

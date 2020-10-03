@@ -13,6 +13,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     showMenu: false,
+    open: false,
     info: '',
   },
   mutations: {
@@ -21,6 +22,9 @@ export default new Vuex.Store({
     },
     inform(state, info) {
       state.info = info
+    },
+    openBook(state, payload){
+      state.open = payload
     }
   },
   actions,
