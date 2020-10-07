@@ -1,6 +1,16 @@
 import { storage } from "firebase/app"
 import store from "@/store"
+import formatText from "@/services/replace";
 
+
+export function createPath(book) {
+    const collection = book.collection;
+    const list = collection.list;
+    const userId = list.user.id
+    const concat = `${userId}/${list.name}/${collection.name}/${book.title}`;
+    const path = formatText(concat).replaceAll(" ", "-").toLowerCase();
+    return path;
+}
 export async function uploadBook({ path, file }){
     try { 
         const ref = storage().ref()
@@ -11,12 +21,12 @@ export async function uploadBook({ path, file }){
         console.error(err)
     }
 }
-export function uploadImg({ path, imgDataURL }){
+export async function uploadImg({ path, imgDataURL }){
     try {
         const ref = storage().ref()
-        const child = ref.child(path)
+        const child = ref.child(path + "-img")
         const dataUrl = imgDataURL.split(",")[1]
-        return child.putString(dataUrl, "base64", {contentType: 'image/jpeg'})
+        return await child.putString(dataUrl, "base64", { contentType: 'image/jpeg' })
     } catch ( err ) {
         store.dispatch("notify", {...err, message: "Erro ao fazer upload do arquivo", time:4000, type: "warning"})
         console.error("Não foi possivel salvar um imagem deste livro.", err)

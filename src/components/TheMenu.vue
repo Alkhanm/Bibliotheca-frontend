@@ -5,7 +5,8 @@
       <v-card dark>
         <v-card-actions>
           <v-btn @click="newList()" class="grey darken-2">
-            <v-icon :color="create ? 'success': 'info'">library_add</v-icon>Nova
+            <v-icon :color="create ? 'success' : 'info'">library_add</v-icon
+            >Nova
           </v-btn>
           <v-spacer></v-spacer>
           <v-text-field
@@ -22,7 +23,7 @@
         <v-card-text v-show="search" class="text-center">
           <span class="subtitle-1">
             <strong>Resultados:</strong>
-            {{filtredList.length}} de {{lists.length}}
+            {{ filtredList.length }} de {{ lists.length }}
           </span>
         </v-card-text>
       </v-card>
@@ -32,12 +33,15 @@
         v-for="list in filtredList"
         :key="list.id"
         :list="list"
-        class="mt-7"> 
+        class="mt-7"
+      >
       </List>
     </v-card>
-    <v-alert class="mt-4" v-show="!lists.length" text type="info">
+    <v-btn v-if="loading" block loading text></v-btn>
+    <v-alert class="mt-4" v-else-if="!lists.length" text type="info">
       Nenhuma lista salva.
-      <br />Clique no botão acima para adicionar a sua próxima lista de leitura :D
+      <br />Clique no botão acima para adicionar a sua próxima lista de leitura
+      :D
     </v-alert>
   </v-container>
 </template>
@@ -45,15 +49,21 @@
 <script>
 import List from "@/components/List";
 import ListNew from "@/components/ListNew";
-import BookLatest from "./BooksLatest"
+import BookLatest from "./BooksLatest";
 import formatText from "@/services/replace";
+import { mapActions } from "vuex";
+
 export default {
   name: "Menu",
   components: { ListNew, List, BookLatest },
-  data:() => ({ search: "", }),
+  data: () => ({ search: "", loading: true }),
   computed: {
-    create() { return this.$store.state.list.create; },
-    lists() { return this.$store.state.list.arr; },
+    create() {
+      return this.$store.state.list.create;
+    },
+    lists() {
+      return this.$store.state.list.arr;
+    },
     filtredList() {
       const search = formatText(this.search);
       if (!search) return this.lists;
@@ -68,12 +78,14 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["fetchLists"]), 
     newList() {
       this.$store.commit("createList", !this.create);
     },
   },
-  created() {
-    this.$store.dispatch("fetchList");
+  async mounted() {
+    if (!this.lists.length) await this.fetchLists()
+    this.loading = false;
   },
 };
 </script>

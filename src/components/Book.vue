@@ -1,55 +1,68 @@
 <template>
-<v-container>
-  <v-card id="library" class="mx-auto pa-2" dark max-width="1000">
-    <v-card-title>
-      <p>{{ book.title }}</p>
-      <v-spacer></v-spacer>
-    <BookActions :book="book"></BookActions>
-    </v-card-title>
-    <v-card-subtitle class="text-capitalize">
-      Autor: {{ book.author.name }}
-    </v-card-subtitle>
-    <v-card-text id="content" class="text-capitalize">
+  <v-container>
+    <v-card id="library" dark class="mx-auto pa-2" max-width="1000">
+      <v-card-title>
+        <span>
+          <span class="text-capitalize">{{ book.title }}</span> [
+          {{ status.name }} ]
+          <v-progress-linear
+            v-if="hasPDF"
+            :value="status.value"
+            striped
+            height="10px"
+            :color="statusColor"
+          >
+          </v-progress-linear>
+        </span>
+      </v-card-title>
+      <v-card-subtitle class="text-capitalize">
+        Coleção: {{ book.collection.name }}
+      </v-card-subtitle>
+
+      <v-divider></v-divider>
+
+      <v-card-text id="content" class="text-capitalize">
         <div v-if="loading">
           <v-btn large fab loading></v-btn>
           <p class="mr-2">Aguarde...</p>
         </div>
-        <template v-else-if="hasPDF"> 
-        <v-img  
-          @click="openBook(true)" 
-          :src="imgURL"  
-          class="image-book" 
-          max-width="30%" />
-        <PDFReader 
-          :book="book" 
-          :pdfURL="pdfURL"></PDFReader>
+        <template v-else-if="hasPDF">
+          <v-img
+            @click="openBook(true)"
+            :src="imgURL"
+            class="image-book"
+            max-width="30%"
+          />
+          <PDFReader :book="book" :pdfURL="pdfURL"></PDFReader>
         </template>
         <p id="text-about-book" class="text-start pl-5 pr-5">
-          {{book.about}}
+          {{ book.about }}
         </p>
         <span class="text-end">
-          <div>Lista: {{ book.author.list.name }}</div>
+          <div>Lista: {{ book.collection.list.name }}</div>
           <div>Categorias: {{ categories }}</div>
-          <div>Última leitura: {{ book.lastReading }}</div>
+          <div>Última leitura: {{ lastReading }}</div>
         </span>
-    </v-card-text>
-    <v-btn @click="$router.back()" text min-width="13%">
-      <v-icon>keyboard_return</v-icon>
-    </v-btn>
-  </v-card>
-</v-container>
+      </v-card-text>
+
+      <v-divider></v-divider>
+
+      <BookActions @addedPDF="getArchives()" :book="book"></BookActions>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
-import BookActions from "./BookActions"
-import PDFReader from "./PDFReader"
-import { mapActions, mapGetters, mapMutations } from "vuex";
-import { downloadBook } from "@/services/storage"
+import BookActions from "./BookActions";
+import { READING_STATUS as status } from "@/services/enums";
+import PDFReader from "./PDFReader";
+import { mapGetters, mapMutations } from "vuex";
+import { downloadBook } from "@/services/storage";
 
 export default {
   name: "Book",
-  components: { BookActions, PDFReader }, 
-  data: () => ({ pdfURL: '' , imgURL: '', loading: null }),
+  components: { BookActions, PDFReader },
+  data: () => ({ pdfURL: "", imgURL: "", loading: null }),
   computed: {
     ...mapGetters(["getBookById"]),
     book() {
@@ -57,36 +70,75 @@ export default {
       return this.getBookById(id);
     },
     categories() {
-      const cat = this.book.author.list.categories;
-      if (cat.length) return cat.reduce((acc, att) => acc.concat(", ", att));
-      return "Sem categorias";
+      const cat = this.book?.collection?.list?.categories;
+      return cat.length
+        ? cat.reduce((acc, att) => acc.concat(", ", att))
+        : "Sem catégorias";
     },
-    hasPDF(){ return !!this.book.path }
+    lastReading() {
+      const date = new Date(this.book.lastReading);
+      return date.toLocaleString().split(" ").reverse().join(" ");
+    },
+    statusColor() {
+      const colorsOptions = [
+        "#BDBDBD",
+        "#80D8FF",
+        "#00B0FF",
+        "info",
+        "success",
+      ];
+      const colorNumber = Math.min(
+        Math.round((this.status.value / 100) * colorsOptions.length),
+        colorsOptions.length - 1
+      );
+      const color = colorsOptions[colorNumber];
+      return color;
+    },
+    status() {
+      const name = this.book.readingStatus;
+      const value = name === status.COMPLETED ? 100 : (this.book.currentPage / this.book.totalPages) * 100;
+      return { name, value };
+    },
+    hasPDF() {
+      return !!this.book.path;
+    },
   },
   methods: {
-    ...mapActions(["deleteBook"]),
     ...mapMutations(["openBook"]),
-    async getArchives(){
-      this.loading = true
-      const { img, pdf } = await downloadBook(this.book);
-      this.imgURL = img
-      this.pdfURL = pdf
-      this.loading = false
-    }
+    async getArchives() {
+      this.loading = true;
+      try {
+        const { img, pdf } = await downloadBook(this.book);
+        this.imgURL = img;
+        this.pdfURL = pdf;
+      } catch (err) {
+        console.error(err);
+      } finally {
+        this.loading = false;
+      }
+    },
   },
   async created() {
-    if (!this.book) this.$router.push({name: "Listas"})
-    if (this.hasPDF) await this.getArchives()  
-  }
+    if (!this.book) this.$router.push({ name: "Listas" });
+    if (this.hasPDF) await this.getArchives();
+  },
 };
 </script>
 <style>
-#content { display: flex; justify-content: space-between; }
-.text-content{
+#content {
+  display: flex;
+  justify-content: space-between;
+}
+.text-content {
   display: flex;
 }
 #text-about-book {
-  flex:1;
+  flex: 1;
 }
-.image-book{ cursor: pointer; }
+.image-book {
+  cursor: pointer;
+}
+.progress-reading {
+  color: #ffab40;
+}
 </style>

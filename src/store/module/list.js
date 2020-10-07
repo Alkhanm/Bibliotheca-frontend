@@ -2,14 +2,17 @@ import http from '@/services/api/axios'
 import {LIST} from"@/services/api/url"
 
 export default {
-    state: { arr: [], create: false },
+    state: { 
+        arr: [], 
+        create: false 
+    },
     mutations: {
         pullLists(state, lists){ state.arr = lists },
         addList(state, list){ state.arr.push(list) },
         createList(state, payload){ state.create = payload },
     },
     actions: {
-        async fetchList({commit, dispatch}){
+        async fetchLists({commit, dispatch}){
             try { 
                 const response = await http.get(LIST.URL)
                 const lists = response.data

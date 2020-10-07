@@ -1,18 +1,18 @@
 <template>
   <v-card dark class="mx-auto">
     <v-card-title class="font-weight-regular justify-space-between">
-      <span class="text-uppercase">{{list.name}}</span>
-      <v-speed-dial direction="left">
-        <template v-slot:activator>
-          <v-btn color="grey darken-3" dark small fab>
+      <span class="text-uppercase">{{ list.name }}</span>
+      <v-menu dark left  offset-x>
+        <template v-slot:activator="{on, attrs}"> 
+          <v-btn v-bind="attrs" v-on="on" text >
             <v-icon>menu</v-icon>
           </v-btn>
         </template>
-        <v-btn @click="deleteList(list)" fab small>
+        <CollectionNew v-bind="{ list }"></CollectionNew>
+        <v-btn class="ml-2 mr-2" @click="deleteList(list)" fab small>
           <v-icon color="red">mdi-delete</v-icon>
         </v-btn>
-        <CollectionNew></CollectionNew>
-      </v-speed-dial>
+      </v-menu>
     </v-card-title>
     <v-card-subtitle>
       <v-chip
@@ -21,19 +21,20 @@
         @click="searchFor(cat)"
         class="ml-1 mb-1"
         small
-        v-text="cat"/>
+        v-text="cat"
+      />
     </v-card-subtitle>
     <v-divider></v-divider>
     <v-window v-model="step">
       <v-window-item :value="1">
         <v-card-text class="text-info">
-          <div>{{list.description}}</div>
-          <div class="text-right">Iniciada em: {{list.startDate}}</div>
+          <div>{{ list.description }}</div>
+          <div class="text-right">Iniciada em: {{ list.startDate }}</div>
         </v-card-text>
       </v-window-item>
       <v-window-item :value="2">
         <v-spacer></v-spacer>
-        <Authors :list="list"></Authors>
+        <Collections :list="list"></Collections>
       </v-window-item>
     </v-window>
 
@@ -54,13 +55,13 @@
 </template>
 
 <script>
-import Authors from "@/components/Authors";
-import CollectionNew from "./CollectionNew"
+import Collections from "@/components/Collections";
+import CollectionNew from "./CollectionNew";
 import { mapActions } from "vuex";
 
 export default {
   name: "Section",
-  components: { Authors, CollectionNew },
+  components: { Collections, CollectionNew },
   props: { list: { type: Object, requerid: true } },
   data: () => ({
     showActionsPanel: false,
@@ -80,3 +81,9 @@ export default {
   },
 };
 </script>
+<style>
+  .actions-list {
+    display: flex;
+    flex-direction: row;
+  }
+</style>
