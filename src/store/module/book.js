@@ -19,7 +19,7 @@ export default {
     actions: {
         async fetchBooks({ commit, dispatch }, { id }) {
             try {
-                const response = await http.get(BOOK.URL, { params: { collection: id } })
+                const response = await http.get(BOOK.URL, { params: { author: id } })
                 const books = response.data
                 commit("addAllBooks", books)
             } catch (err) {
@@ -51,7 +51,7 @@ export default {
         },
     },
     getters: {
-        getBooksByCollection: ({ arr }) => ({ id }) => arr.filter(book => book.collection.id === id),
+        getBooksByAuthor: ({ arr }) => ({ id }) => arr.filter(book => book.author.id === id),
         getBookById: ({ arr }) => (id) => arr.find(book => book.id === id),
     }
 }

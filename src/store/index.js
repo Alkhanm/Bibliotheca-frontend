@@ -5,7 +5,7 @@ import * as actions from './actions'
 
 import user from './module/user'
 import list from './module/list'
-import collection from './module/collection'
+import author from './module/author'
 import book from './module/book'
 
 Vue.use(Vuex)
@@ -31,7 +31,7 @@ export default new Vuex.Store({
   modules: {
     user,
     list,
-    collection,
+    author,
     book,
   },
 })

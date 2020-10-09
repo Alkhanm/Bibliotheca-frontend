@@ -22,13 +22,13 @@ import { mapActions, mapGetters } from "vuex";
 export default {
   name: "Books",
   props: {
-    collection: { type: Object, required: true },
+    author: { type: Object, required: true },
   },
   data: () => ({ loading: true }),
   computed: {
-    ...mapGetters(["getBooksByCollection"]),
+    ...mapGetters(["getBooksByAuthor"]),
     books() {
-      return this.getBooksByCollection(this.collection);
+      return this.getBooksByAuthor(this.author);
     },
     hasBooks(){
       return !!this.books.length
@@ -36,7 +36,7 @@ export default {
   },
   methods: mapActions(["fetchBooks"]),
   async mounted() {
-    if (!this.books.length) await this.fetchBooks(this.collection);
+    if (!this.books.length) await this.fetchBooks(this.author);
     this.loading = false;
   },
 };

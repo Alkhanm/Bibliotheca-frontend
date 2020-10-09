@@ -10,11 +10,11 @@ const USER = {
 const LIST = {
     URL: "/lists",
 }
-const COLLECTION = {
-    URL: "/collections",
+const AUTHOR = {
+    URL: "/authors",
 }
 const BOOK = {
     URL: "/books",
-    FETCH_BY_AUTHOR: "/books/collection",
+    FETCH_BY_AUTHOR: "/books/author",
 }
-export { BASE, AUTH, BOOK, COLLECTION, USER, LIST }
+export { BASE, AUTH, BOOK, AUTHOR, USER, LIST }

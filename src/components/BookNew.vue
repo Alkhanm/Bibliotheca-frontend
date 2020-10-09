@@ -1,14 +1,8 @@
 <template>
-  <v-dialog v-model="dialog" persistent max-width="800px">
+  <v-dialog v-model="dialog" persistent max-width="500px">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn
-        v-bind="attrs"
-        v-on="on"
-        fab
-        small
-        color="grey darken-3 text-lowercase"
-      >
-        <v-icon color="success">mdi-plus</v-icon>
+      <v-btn v-bind="attrs" v-on="on" fab small>
+        <v-icon>book</v-icon>
       </v-btn>
     </template>
     <v-card dark class="grey darken-4">
@@ -20,12 +14,27 @@
           v-model="book.title"
           autofocus
           label="Título"
-          hint="Informe o título deste livro. Se vazio, o nome do arquivo será usado."
+          hint="Informe o título deste livro."
         />
+        <div class="input-author-container ma-2 pa-2">
+          <input
+            v-model="author.name"
+            list="author-input"
+            id="author-field"
+          />
+          <label class="author-label" for="author-field">Autor</label>
+          <datalist id="author-input">
+            <option
+              v-for="author in authors"
+              :key="author.id"
+              :value="author.name"
+            />
+          </datalist>
+        </div>
         <!-- Upload do livro -->
         <v-file-input
           class="mb-4"
-          v-model="book.file"
+          v-model="file"
           show-size
           label="Incluir arquivo"
           :rules="ruleFile"
@@ -67,31 +76,43 @@ import { getBookCover } from "@/services/PdfService";
 
 export default {
   name: "BookNew",
-  props: { collection: Object },
-  data: () => ({
-    dialog: false,
-    loading: false,
-    book: {},
-    ruleFile: [
-      (v) =>
-        (!!v && v.type === "application/pdf") || "Tipo de arquivo não aceito.",
-      (v) =>
-        (!!v && v.size < 15728640) ||
-        "Ainda não é possivel salvar arquivos tão grandes.",
-    ],
-  }),
+  props: { list: Object },
+  data() {
+    return {
+      dialog: false,
+      loading: false,
+      book: {},
+      author: {},
+      file: null,
+      ruleFile: [
+        (v) =>
+          (!!v && v.type === "application/pdf") ||
+          "Tipo de arquivo não aceito.",
+        (v) =>
+          (!!v && v.size < 15728640) ||
+          "Ainda não é possivel salvar arquivos tão grandes.",
+      ],
+    };
+  },
   computed: {
     isValid() {
-      const file = this.book?.file;
-      if (file && file.type !== "application/pdf") return false;
+      if (this.file && this.file.type !== "application/pdf") return false;
       return this.book.title;
+    },
+    authors() {
+      return this.$store.state.author.arr;
     },
   },
   methods: {
-    ...mapActions(["saveBook"]),
-    async add() {
-      this.loading = true;
-      this.book.collection = this.collection;
+    ...mapActions(["saveBook", "saveAuthor"]),
+    async addAuthor() {
+      this.author.list = this.list;
+      const author = await this.saveAuthor(this.author);
+      return author;
+    },
+    async addBook() {
+      this.book.file = this.file;
+      this.book.author = await this.addAuthor();
       if (this.book.file) {
         this.book.path = createPath(this.book);
         const { img, numPages } = await getBookCover(this.book.file);
@@ -100,6 +121,10 @@ export default {
         this.book.totalPages = numPages;
       }
       await this.saveBook(this.book); //espera a operação
+    },
+    async add() {
+      this.loading = true;
+      await this.addBook();
       this.dialog = false;
       this.loading = false;
     },
@@ -113,6 +138,25 @@ export default {
 }
 .select-field {
   display: flex;
+}
+#author-field {
+  border: 0;
+  border-bottom: 2px solid #9e9e9e;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+#author-field:valid,
+#author-field:focus {
+  border-bottom: 2px solid #26a69a;  
+}
+
+#author-field:valid + label,
+#author-field:focus + label {
+  color: #26a69a;
+  font-size: .8rem;
+  top: -30px;
+  pointer-events: none;
 }
 </style>
 

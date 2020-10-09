@@ -1,8 +1,8 @@
 <template>
-  <v-dialog v-model="dialog" max-width="700px">
+  <v-dialog v-model="dialog" max-width="500px">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" v-on="on" small fab>
-        <v-icon color="green">mdi-plus</v-icon>
+      <v-btn v-bind="attrs" v-on="on" small fab class="ml-2 mr-2">
+        <v-icon>collections_bookmark</v-icon>
       </v-btn>
     </template>
     <v-card dark>
@@ -15,7 +15,7 @@
       </v-card-title>
       <v-card-text>
         <v-text-field
-          v-model="collection.name"
+          v-model="author.name"
           clearable
           maxlength="30"
           label="Nome da coleção"
@@ -25,13 +25,13 @@
         </v-text-field>
         <v-row>
           <v-col cols="12" sm="6">
-            <v-btn @click="newCollection()" block class="grey darken-3">
+            <v-btn @click="newAuthor()" block class="grey darken-3">
               Salvar
             </v-btn>
           </v-col>
           <v-col>
             <v-btn
-              @click="(dialog = false), (collection = {})"
+              @click="(dialog = false), (author = {})"
               block
               class="grey darken-3"
             >
@@ -52,20 +52,17 @@ export default {
       type: Object,
     },
   },
-  data: () => ({ 
-    collection: {}, 
-    dialog: false 
+  data: () => ({
+    author: {},
+    dialog: false,
   }),
   methods: {
-    newCollection() {
-      this.collection.list = this.list;
-      this.$store.dispatch("saveCollection", this.collection);
+    newAuthor() {
+      this.author.list = this.list;
+      this.$store.dispatch("saveAuthor", this.author);
       this.dialog = false;
-      this.collection = {};
+      this.author = {};
     },
   },
 };
 </script>
-
-<style>
-</style>

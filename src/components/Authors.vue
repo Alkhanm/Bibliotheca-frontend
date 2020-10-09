@@ -1,0 +1,48 @@
+<template>
+  <v-list>
+    <v-list-group
+      prepend-icon="account_circle"
+      v-for="author in author"
+      :key="author.id"
+    >
+      <template v-slot:activator>
+        <v-list-item-title v-text="author.name" />
+      </template>
+      <Books :author="author"></Books>
+    </v-list-group>
+    <v-list-item v-if="loading">
+      <v-btn loading block text></v-btn>
+    </v-list-item>
+    <v-list-item v-else-if="!author.length">
+      <v-list-item-content>
+        <v-alert text type="info">Nenhum autor adicionado</v-alert>
+      </v-list-item-content>
+    </v-list-item>
+  </v-list>
+</template>
+
+<script>
+import Books from "@/components/Books";
+import { mapActions, mapGetters } from "vuex";
+
+export default {
+  name: "ListAuthor",
+  components: { Books },
+  props: { list: { type: Object, required: true } },
+  data: () => ({ loading: true }),
+  computed: {
+    ...mapGetters(["getAuthorsByList"]),
+    author() {
+      return this.getAuthorsByList(this.list);
+    },
+  },
+  methods: mapActions(["fetchAuthors", "deleteAuthor"]),
+  async mounted() {
+    if (!this.author.length) await this.fetchAuthors(this.list);
+    this.loading = false;
+  },
+};
+</script>
+
+<style>
+</style>

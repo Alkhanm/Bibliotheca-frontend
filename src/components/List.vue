@@ -2,15 +2,15 @@
   <v-card dark class="mx-auto">
     <v-card-title class="font-weight-regular justify-space-between">
       <span class="text-uppercase">{{ list.name }}</span>
-      <v-menu dark left  offset-x>
-        <template v-slot:activator="{on, attrs}"> 
-          <v-btn v-bind="attrs" v-on="on" text >
+      <v-menu dark left offset-x>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn v-bind="attrs" v-on="on" text>
             <v-icon>menu</v-icon>
           </v-btn>
         </template>
-        <CollectionNew v-bind="{ list }"></CollectionNew>
+        <BookNew v-bind="{ list }"></BookNew>
         <v-btn class="ml-2 mr-2" @click="deleteList(list)" fab small>
-          <v-icon color="red">mdi-delete</v-icon>
+          <v-icon >mdi-delete</v-icon>
         </v-btn>
       </v-menu>
     </v-card-title>
@@ -34,7 +34,7 @@
       </v-window-item>
       <v-window-item :value="2">
         <v-spacer></v-spacer>
-        <Collections :list="list"></Collections>
+        <Authors :list="list"></Authors>
       </v-window-item>
     </v-window>
 
@@ -55,13 +55,13 @@
 </template>
 
 <script>
-import Collections from "@/components/Collections";
-import CollectionNew from "./CollectionNew";
+import Authors from "@/components/Authors";
+import BookNew from "./BookNew";
 import { mapActions } from "vuex";
 
 export default {
   name: "Section",
-  components: { Collections, CollectionNew },
+  components: { Authors, BookNew },
   props: { list: { type: Object, requerid: true } },
   data: () => ({
     showActionsPanel: false,
@@ -82,8 +82,8 @@ export default {
 };
 </script>
 <style>
-  .actions-list {
-    display: flex;
-    flex-direction: row;
-  }
+.actions-list {
+  display: flex;
+  flex-direction: row;
+}
 </style>

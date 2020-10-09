@@ -16,7 +16,7 @@
         </span>
       </v-card-title>
       <v-card-subtitle class="text-capitalize">
-        Coleção: {{ book.collection.name }}
+        Coleção: {{ book.author.name }}
       </v-card-subtitle>
 
       <v-divider></v-divider>
@@ -39,7 +39,7 @@
           {{ book.about }}
         </p>
         <span class="text-end">
-          <div>Lista: {{ book.collection.list.name }}</div>
+          <div>Lista: </div>
           <div>Categorias: {{ categories }}</div>
           <div>Última leitura: {{ lastReading }}</div>
         </span>
@@ -70,7 +70,7 @@ export default {
       return this.getBookById(id);
     },
     categories() {
-      const cat = this.book?.collection?.list?.categories;
+      const cat = this.book?.author?.list?.categories;
       return cat.length
         ? cat.reduce((acc, att) => acc.concat(", ", att))
         : "Sem catégorias";
@@ -80,15 +80,9 @@ export default {
       return date.toLocaleString().split(" ").reverse().join(" ");
     },
     statusColor() {
-      const colorsOptions = [
-        "#BDBDBD",
-        "#80D8FF",
-        "#00B0FF",
-        "info",
-        "success",
-      ];
+      const colorsOptions = ["#BDBDBD", "#80D8FF", "#00B0FF", "info", "success"];
       const colorNumber = Math.min(
-        Math.round((this.status.value / 100) * colorsOptions.length),
+        (this.status.value / 100) * colorsOptions.length,
         colorsOptions.length - 1
       );
       const color = colorsOptions[colorNumber];
