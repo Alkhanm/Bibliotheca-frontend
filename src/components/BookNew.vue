@@ -14,25 +14,30 @@
           v-model="book.title"
           autofocus
           label="Título"
-          hint="Informe o título deste livro."
+          hint="Edite o título deste livro aqui."
+          persistent-hint
+          clearable
+          class="mb-5"
         />
-        <div class="input-author-container ma-2 pa-2">
-          <input
-            v-model="author.name"
-            list="author-input"
-            id="author-field"
+        <v-text-field
+          v-model="author.name"
+          list="author-field"
+          label="Author e/ou serie (opcional)"
+          hint="Nome do autor (ou serie) a qual o livro pertence. "
+        >
+        </v-text-field>
+        <datalist id="author-field">
+          <option
+            v-for="author in authors"
+            :key="author.id"
+            class="author-option pa-5"
+            :value="author.name"
           />
-          <label class="author-label" for="author-field">Autor</label>
-          <datalist id="author-input">
-            <option
-              v-for="author in authors"
-              :key="author.id"
-              :value="author.name"
-            />
-          </datalist>
-        </div>
+        </datalist>
+
         <!-- Upload do livro -->
         <v-file-input
+          @change="getAuxiliaryName()"
           class="mb-4"
           v-model="file"
           show-size
@@ -70,7 +75,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import { uploadBook, uploadImg, createPath } from "@/services/storage";
 import { getBookCover } from "@/services/PdfService";
 
@@ -79,10 +84,11 @@ export default {
   props: { list: Object },
   data() {
     return {
+      items: ["foo", "bar", "fizz", "buzz"],
       dialog: false,
       loading: false,
       book: {},
-      author: {},
+      author: { list: this.list },
       file: null,
       ruleFile: [
         (v) =>
@@ -95,19 +101,33 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(["getAuthorByName"]),
     isValid() {
       if (this.file && this.file.type !== "application/pdf") return false;
       return this.book.title;
     },
     authors() {
-      return this.$store.state.author.arr;
+      const authors = this.$store.state.author.arr;
+      if (!authors.length) this.fetchAuthors(this.list)
+      return authors;
     },
   },
   methods: {
-    ...mapActions(["saveBook", "saveAuthor"]),
+    ...mapActions(["saveBook", "saveAuthor", "fetchAuthors"]),
+    getAuxiliaryName(){
+      if (this.book.name) return
+      const fileName = this.file.name
+      // ^&‘{}[],!–?()
+      const regExp = /pdf|@|-|=|%|#|_|~|\+|\$|\*|\|/g;
+      const auxName = fileName.replace(regExp,  " ")
+      const name = auxName.replaceAll("  ", "").trim()
+      this.book.title = name
+    },
     async addAuthor() {
-      this.author.list = this.list;
-      const author = await this.saveAuthor(this.author);
+      if (!this.author.name) this.author.name = "Minha coleção"
+      const author =
+        this.getAuthorByName(this.author.name) ||
+        (await this.saveAuthor(this.author));
       return author;
     },
     async addBook() {
@@ -125,6 +145,7 @@ export default {
     async add() {
       this.loading = true;
       await this.addBook();
+      console.log(this.author.name);
       this.dialog = false;
       this.loading = false;
     },
@@ -134,29 +155,10 @@ export default {
 
 <style>
 .form-book {
-  width: 80%;
+  width: 70%;
 }
 .select-field {
   display: flex;
-}
-#author-field {
-  border: 0;
-  border-bottom: 2px solid #9e9e9e;
-  outline: none;
-  box-sizing: border-box;
-  width: 100%;
-}
-#author-field:valid,
-#author-field:focus {
-  border-bottom: 2px solid #26a69a;  
-}
-
-#author-field:valid + label,
-#author-field:focus + label {
-  color: #26a69a;
-  font-size: .8rem;
-  top: -30px;
-  pointer-events: none;
 }
 </style>
 

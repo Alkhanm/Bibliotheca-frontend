@@ -3,7 +3,7 @@ import { BOOK } from "@/services/api/url"
 import { deleteArchive } from "@/services/storage"
 
 export default {
-    state: { arr: [] },
+    state: { arr: [], loading: false },
     mutations: {
         addAllBooks(state, books) {
             state.arr.push(...books)
@@ -14,7 +14,7 @@ export default {
         removeBook({ arr }, { id }) {
             const book = arr.find(book => book.id === id)
             arr.splice(arr.indexOf(book), 1)
-        }
+        },
     },
     actions: {
         async fetchBooks({ commit, dispatch }, { id }) {
@@ -26,6 +26,7 @@ export default {
                 dispatch("notify", { ...err, time: 5000 })
             }
         },
+        
         async saveBook({ commit, dispatch }, book) {
             try {
                 const response = await http.post(BOOK.URL, book)
@@ -35,6 +36,7 @@ export default {
                 dispatch("notify", { ...err, time: 5000 })
             }
         },
+
         async deleteBook({ commit, dispatch }, book) {
             try {
                 await http.delete(`${BOOK.URL}/${book.id}`)
@@ -48,6 +50,13 @@ export default {
             await http.put(`${BOOK.URL}/${book.id}`, book)
             commit("removeBook", book)
             commit("addBook", book)
+        },
+        async fetchLastBook(context) {
+            const response = await http.get(`${BOOK.URL}/last`)
+            const book = response.data[0]
+            const isLast = context.state.arr.find(b => b === book)
+            if (!isLast) context.commit("addBook", book)
+            return book
         },
     },
     getters: {

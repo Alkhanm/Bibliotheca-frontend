@@ -8,7 +8,8 @@
         @touchend="movePageOnTouch($event)"
         @dblclick="openBottom(!showBottom)"
         id="canvas-container"
-        class="text-center pa-0">
+        class="text-center pa-0"
+      >
         <canvas class="mx-auto" id="the-canvas"></canvas>
         <div id="space-between"></div>
       </v-card-text>
@@ -114,7 +115,7 @@ export default {
         this.pageRendering = true;
         await renderPage(this.pdf, num, "the-canvas", this.scale);
       } catch (err) {
-        console.error(err)
+        console.error(err);
       } finally {
         this.pageRendering = false;
       }
@@ -125,7 +126,7 @@ export default {
         this.totalPages = this.pdf.numPages;
         this.slider = this.pageNum = this.book.currentPage;
       } catch (err) {
-        this.$store.dispatch("notify", { ...err });
+        console.error(err)
       } finally {
         this.loading = false;
       }
@@ -133,7 +134,9 @@ export default {
     showBottomOnScroll() {
       const container = document.getElementById("canvas-container");
       const top = Math.round(container.scrollTop);
-      const topMax = Math.round(container.scrollHeight - container.clientHeight);
+      const topMax = Math.round(
+        container.scrollHeight - container.clientHeight
+      );
       //Para telas pequenas, a barra se opções será oculta na navegação
       if (top < topMax && screen.height < 500) this.showBottom = false;
       //Ao chegar no fim da página, mostre a barra
@@ -142,7 +145,9 @@ export default {
     openBottom(value) {
       const container = document.getElementById("canvas-container");
       const top = Math.round(container.scrollTop);
-      const topMax = Math.round(container.scrollHeight - container.clientHeight);
+      const topMax = Math.round(
+        container.scrollHeight - container.clientHeight
+      );
       if (top !== topMax) this.showBottom = value;
     },
     close() {
@@ -150,8 +155,7 @@ export default {
       const book = { ...this.book };
       book.lastReading = Date.now();
       book.currentPage = this.pageNum;
-      if (!book.readingStatus) 
-        book.readingStatus = READING_STATUS.READING;
+      if (!book.readingStatus) book.readingStatus = READING_STATUS.READING;
       this.updateBook(book);
     },
   },

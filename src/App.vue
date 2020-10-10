@@ -26,7 +26,7 @@ export default {
   computed: {
     info() { return this.$store.state.info },
   },
-  created() {
+  mounted() {
     const userLocal = localStorage.getItem(USER_KEY);
     if (userLocal) this.$store.commit("addUser", JSON.parse(userLocal));
   },

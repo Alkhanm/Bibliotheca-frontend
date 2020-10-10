@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card id="library" dark class="mx-auto pa-2" max-width="1000">
+    <v-card id="library" dark class="mx-auto pa-2" max-width="1000" :loading="loading">
       <v-card-title>
         <span>
           <span class="text-capitalize">{{ book.title }}</span> [
@@ -16,7 +16,7 @@
         </span>
       </v-card-title>
       <v-card-subtitle class="text-capitalize">
-        Coleção: {{ book.author.name }}
+        {{ book.author.name }}
       </v-card-subtitle>
 
       <v-divider></v-divider>
@@ -39,7 +39,7 @@
           {{ book.about }}
         </p>
         <span class="text-end">
-          <div>Lista: </div>
+          <div>Lista: {{book.author.list.name}} </div>
           <div>Categorias: {{ categories }}</div>
           <div>Última leitura: {{ lastReading }}</div>
         </span>
@@ -47,7 +47,7 @@
 
       <v-divider></v-divider>
 
-      <BookActions @addedPDF="getArchives()" :book="book"></BookActions>
+      <BookActions @addedPDF="getArchives()" @loading="loading = $event" :book="book"></BookActions>
     </v-card>
   </v-container>
 </template>
@@ -57,7 +57,7 @@ import BookActions from "./BookActions";
 import { READING_STATUS as status } from "@/services/enums";
 import PDFReader from "./PDFReader";
 import { mapGetters, mapMutations } from "vuex";
-import { downloadBook } from "@/services/storage";
+import { downloadPDF, downloadIMG } from "@/services/storage";
 
 export default {
   name: "Book",
@@ -76,7 +76,9 @@ export default {
         : "Sem catégorias";
     },
     lastReading() {
-      const date = new Date(this.book.lastReading);
+      const lastReading = this.book.lastReading
+      if (!lastReading) return
+      const date = new Date(lastReading);
       return date.toLocaleString().split(" ").reverse().join(" ");
     },
     statusColor() {
@@ -102,9 +104,8 @@ export default {
     async getArchives() {
       this.loading = true;
       try {
-        const { img, pdf } = await downloadBook(this.book);
-        this.imgURL = img;
-        this.pdfURL = pdf;
+        this.imgURL = await downloadIMG(this.book);
+        this.pdfURL = await downloadPDF(this.book);
       } catch (err) {
         console.error(err);
       } finally {

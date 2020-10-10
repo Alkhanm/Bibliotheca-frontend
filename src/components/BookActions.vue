@@ -17,7 +17,7 @@
         </v-btn>
       </template>
 
-      <v-card id="actions" dark :loading="loading">
+      <v-card id="actions" dark>
         <v-list class="grey darken-3">
           <v-subheader>Opções de leitura</v-subheader>
           <v-list-item>
@@ -32,12 +32,6 @@
               <v-icon title="">library_add_check</v-icon>
             </v-btn>
           </v-list-item>
-          <v-list-item>
-            <v-list-item-title>Adicionar descrição</v-list-item-title>
-            <v-btn @click="addDescription()" text>
-              <v-icon>notes</v-icon>
-            </v-btn>
-          </v-list-item>
           <v-subheader>Opções do livro</v-subheader>
           <template v-if="!hasPDF">
             <v-list-item>
@@ -50,9 +44,9 @@
             </v-list-item>
             <v-list-item v-if="showInputFile">
               <v-file-input
-                class="mb-4"
                 v-model="book.file"
                 @change="addFile()"
+                class="mb-4"
                 show-size
                 label="Incluir arquivo"
                 :rules="ruleFile"
@@ -85,7 +79,6 @@ export default {
   props: { book: { type: Object, requerid: true } },
   data() {
     return {
-      loading: false,
       showListChange: false,
       showInputFile: false,
       ruleFile: [
@@ -108,13 +101,13 @@ export default {
   },
   methods: {
     ...mapActions(["deleteBook", "updateBook"]),
-    ...mapMutations(["openBook"]),
+    ...mapMutations(["openBook", "bookLoading"]),
     setAsRead() {
       this.book.readingStatus = status.COMPLETED;
       this.updateBook(this.book);
     },
     async addFile() {
-      this.loading = true;
+      this.$emit("loading", true)
       if (this.isValidFile) {
         this.book.path = createPath(this.book);
         const { img, numPages } = await getBookCover(this.book.file);
@@ -124,10 +117,10 @@ export default {
         await this.updateBook(this.book);
         this.$emit("addedPDF")
       }
-      this.loading = false;
+      this.$emit("loading", false)
     },
     async remove() {
-      this.loading = true;
+      this.$emit("loading", true)
       await this.deleteBook(this.book);
       this.$router.back();
     },

@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import Book from '@/components/Book'
-import TheMenu from '@/components/TheMenu.vue'
-import Authentication from '@/components/Authentication.vue'
+const Book = () => import('@/components/Book')
+const TheMenu = () => import ('@/components/TheMenu.vue')
+const Authentication = () => ('@/components/Authentication.vue')
 
 import { validRouteLogin, validRoutes } from '@/services/validRoutes'
 

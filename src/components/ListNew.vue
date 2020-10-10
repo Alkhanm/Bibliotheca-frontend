@@ -57,8 +57,8 @@
         <v-icon color="info">add</v-icon>Salvar
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn @click="clear()" color="grey darken-3">
-        <v-icon color="info">close</v-icon>Limpar
+      <v-btn @click="close()" color="grey darken-3">
+        <v-icon color="info">close</v-icon>Fechar
       </v-btn>
       <v-spacer></v-spacer>
     </v-card-actions>
@@ -73,15 +73,15 @@ export default {
     return {
       list: {},
       addDescription: false,
-      description: "",
       items: [
         "Literatura Clássica",
-        "Estudos",
-        "Ficção Fantastica",
         "Literatura brasileira",
-        "Romances",
-        "Contos",
+        "Estudo",
+        "Suspense e Terror",
+        "Ficção Fantastica",
         "Ficção Cientifica",
+        "Romance",
+        "Contos",
       ],
     };
   },
@@ -89,12 +89,13 @@ export default {
     ...mapActions(["saveList"]),
     async addList() {
       await this.saveList(this.list);
+      this.list = {}
       this.$store.commit("createList", false);
     },
-    clear() {
+    close() {
       this.list = {};
       this.addDescription = false;
-      this.description = "";
+      this.$store.commit("createList", false);
     },
     remove(item) {
       this.list.categories.splice(this.list.categories.indexOf(item), 1);

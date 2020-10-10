@@ -4,13 +4,14 @@ import formatText from "@/services/replace";
 
 export function createPath(book) { 
     const id = store.state.user.id
-    const list = book.list.name
-    const author = book.author.name || ""
-    const concat = `${id}/${list}/${author}/${book.title}`;
+    const author = book.author
+    const list = author.list
+    const concat = `${id}/${list.name}/${author.name}/${book.title}`;
     const path = formatText(concat).replaceAll(" ", "-").replaceAll("//", "/")
         .toLowerCase();
     return path;
 }
+
 export async function uploadBook({ path, file }) {
     try {
         const ref = storage().ref()
@@ -33,6 +34,27 @@ export async function uploadImg({ path, imgDataURL }) {
         console.error("Não foi possivel salvar um imagem deste livro.", err)
     }
 }
+
+export async function downloadIMG({ path }){
+    try {
+        const ref = storage().ref()
+        return await ref.child(path + "-img").getDownloadURL()
+    } catch (err) {
+        store.dispatch("notify", { ...err, message: "Erro ao fazer download da imagem", time: 4000, type: "warning" })
+        console.error(err)
+    }
+}
+
+export async function downloadPDF({ path }){
+    try {
+        const ref = storage().ref()
+        return await ref.child(path).getDownloadURL()
+    } catch (err) {
+        store.dispatch("notify", { ...err, message: "Erro ao fazer download do PDF", time: 4000, type: "warning" })
+        console.error(err)
+    }
+}
+
 export async function downloadBook({ path }) {
     try {
         const URL = {}

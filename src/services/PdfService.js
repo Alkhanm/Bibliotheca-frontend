@@ -16,39 +16,34 @@ export async function renderPDF(pdf) {
 * Se nem um id for passado, ele irá buscar esse elemento e irá renderizar a página nela, 
 * se não for irá criar um novo elemento no DOM */
 export async function renderPage(pdf, numPage, id, scale = 2) {
+
   const scales = { 1: 3.3, 2: 4 };
   const defaultScale = 4;
   const scaleFromDevice = scales[window.devicePixelRatio] || defaultScale;
-  try {
-    const page = await pdf.getPage(numPage);
-    const viewport = page.getViewport({ scale });
 
-    const canvas = id ?
-      document.getElementById(id) :
-      document.createElement("canvas")
+  const page = await pdf.getPage(numPage);
+  const viewport = page.getViewport({ scale });
 
-    const context = canvas.getContext("2d");
+  const canvas = id ? document.getElementById(id) : document.createElement("canvas")
 
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
+  const context = canvas.getContext("2d");
 
-    const displayWidth = 1.7;
-    canvas.style.width = `${(viewport.width * displayWidth) / scaleFromDevice}px`;
-    canvas.style.height = `${(viewport.height * displayWidth) / scaleFromDevice}px`;
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
 
-    const renderContext = {
-      canvasContext: context,
-      viewport: viewport,
-    };
+  const displayWidth = 1.7;
+  canvas.style.width = `${(viewport.width * displayWidth) / scaleFromDevice}px`;
+  canvas.style.height = `${(viewport.height * displayWidth) / scaleFromDevice}px`;
 
-    const renderTask = page.render(renderContext);
+  const renderContext = {
+    canvasContext: context,
+    viewport: viewport
+  };
 
-    await renderTask.promise;
-    return canvas
-  } catch (err) {
-    alert(err)
-  }
+  const renderTask = page.render(renderContext);
 
+  await renderTask.promise;
+  return canvas
 }
 
 /* Cria blob da capa do livro (primeira página do PDF), 

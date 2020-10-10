@@ -1,33 +1,35 @@
 <template>
   <v-container fluid>
-    <BookLatest></BookLatest>
     <v-card max-width="1000px" class="grey darken-2 mx-auto">
-      <v-card dark>
-        <v-card-actions>
-          <v-btn @click="newList()" class="grey darken-2">
-            <v-icon :color="create ? 'success' : 'info'">library_add</v-icon
-            >Nova
-          </v-btn>
-          <v-spacer></v-spacer>
-          <v-text-field
-            v-model="search"
-            clearable
-            dense
-            single-line
-            prepend-icon="search"
-            hint="Buscar listas por nome ou categoria"
-            label="Pesquisar lista"
-          />
-          <v-spacer></v-spacer>
-        </v-card-actions>
-        <v-card-text v-show="search" class="text-center">
-          <span class="subtitle-1">
-            <strong>Resultados:</strong>
-            {{ filtredList.length }} de {{ lists.length }}
-          </span>
-        </v-card-text>
-      </v-card>
+        <v-card dark>
+          <v-card-actions>
+            <v-btn @click="newList()" class="grey darken-2">
+              <v-icon :color="create ? 'success' : 'info'">library_add</v-icon
+              >Nova
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-text-field
+              v-model="search"
+              clearable
+              dense
+              single-line
+              prepend-icon="search"
+              hint="Buscar listas por nome ou categoria"
+              label="Pesquisar lista"
+              class="pa-3"
+            />
+            <v-spacer></v-spacer>
+            <BookLatest></BookLatest>
+          </v-card-actions>
+          <v-card-text v-show="search" class="text-center">
+            <span class="subtitle-1">
+              <strong>Resultados:</strong>
+              {{ filtredList.length }} de {{ lists.length }}
+            </span>
+          </v-card-text>
+        </v-card>
       <ListNew v-show="create"> </ListNew>
+
       <List
         @searchFor="search = $event"
         v-for="list in filtredList"
@@ -47,9 +49,9 @@
 </template>
 
 <script>
+import BookLatest from "./BooksLatest";
 import List from "@/components/List";
 import ListNew from "@/components/ListNew";
-import BookLatest from "./BooksLatest";
 import formatText from "@/services/replace";
 import { mapActions } from "vuex";
 
@@ -78,13 +80,13 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["fetchLists"]), 
+    ...mapActions(["fetchLists"]),
     newList() {
       this.$store.commit("createList", !this.create);
     },
   },
   async mounted() {
-    if (!this.lists.length) await this.fetchLists()
+    if (!this.lists.length) await this.fetchLists();
     this.loading = false;
   },
 };
@@ -95,5 +97,9 @@ export default {
   position: fixed;
   z-index: 4;
 }
+.top-menu {
+  display: flex;
+}
+
 </style>
 

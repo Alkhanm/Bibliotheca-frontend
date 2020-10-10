@@ -9,6 +9,9 @@ export default {
     mutations: {
         pullLists(state, lists){ state.arr = lists },
         addList(state, list){ state.arr.push(list) },
+        deleteList(state, list){
+            state.arr.splice(state.arr.indexOf(list), 1)
+        },
         createList(state, payload){ state.create = payload },
     },
     actions: {
@@ -30,15 +33,15 @@ export default {
                dispatch("notify", {...err, time: 5000})
            }
         },
-        async deleteList({state, dispatch}, list){
+        deleteList({commit, dispatch}, list){
             try {
-                await http.delete(`${LIST.URL}/${list.id}`)
-                state.arr.splice(state.arr.indexOf(list), 1)
+                http.delete(`${LIST.URL}/${list.id}`)
+                commit("deleteList", list)
+                commit("removeAuthorsByList", list)                    
             } catch(err){
                 dispatch("notify", {...err, time: 5000})
             }
         }
-
     },
     getters:{}
 }
