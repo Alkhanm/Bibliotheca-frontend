@@ -41,9 +41,7 @@
     </v-card>
     <v-btn v-if="loading" block loading text></v-btn>
     <v-alert class="mt-4" v-else-if="!lists.length" text type="info">
-      Nenhuma lista salva.
-      <br />Clique no botão acima para adicionar a sua próxima lista de leitura
-      :D
+      Nenhuma lista foi salva ainda.
     </v-alert>
   </v-container>
 </template>

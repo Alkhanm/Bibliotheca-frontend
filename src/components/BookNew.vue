@@ -118,16 +118,16 @@ export default {
       if (this.book.name) return
       const fileName = this.file.name
       // ^&‘{}[],!–?()
-      const regExp = /pdf|@|-|=|%|#|_|~|\+|\$|\*|\|/g;
+      const regExp = /.pdf$|@|-|=|%|#|_|~|\+|\$|\*|\|/g;
       const auxName = fileName.replace(regExp,  " ")
       const name = auxName.replaceAll("  ", "").trim()
       this.book.title = name
     },
     async addAuthor() {
       if (!this.author.name) this.author.name = "Minha coleção"
-      const author =
-        this.getAuthorByName(this.author.name) ||
-        (await this.saveAuthor(this.author));
+      this.author.name = this.author.name.trim()
+      let author = this.getAuthorByName(this.author.name)
+      if(!author) author = await this.saveAuthor(this.author);
       return author;
     },
     async addBook() {

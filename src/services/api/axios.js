@@ -29,8 +29,6 @@ function error(e) {
         router.push({name: "Login"})
         return Promise.reject(e)
     }
-    //Faz o commit desse erro para ser apresentado no frontend
-    store.dispatch('notify', { ...e.response.data, time: 4000 })
     return Promise.reject(e)
 }
 http.interceptors.response.use(success, error)

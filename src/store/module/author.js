@@ -47,7 +47,11 @@ export default {
             arr.find(author => author.id === id),
 
         getAuthorByName: ({ arr }) => (name) =>
-            arr.find(author => author.name.toUpperCase() === name.toUpperCase()),
+            arr.find(a => {
+                const author = a.name.toUpperCase().trim().replaceAll(" ", "")
+                const authorName = name.toUpperCase().trim().replaceAll(" ", "") 
+                if (author === authorName) return author
+            }),
 
     }
 }

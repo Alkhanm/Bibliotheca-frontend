@@ -1,13 +1,14 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-const Book = () => import('@/components/Book')
-const TheMenu = () => import ('@/components/TheMenu.vue')
-const Authentication = () => ('@/components/Authentication.vue')
+import Book from '@/components/Book'
+import Author from '@/components/Author'
+import TheMenu from  '@/components/TheMenu.vue'
+import Authentication from '@/components/Authentication.vue'
 
 import { validRouteLogin, validRoutes } from '@/services/validRoutes'
 
-Vue.use(VueRouter)
+Vue.use(VueRouter) 
 
 const router = new VueRouter({
   mode: 'history',
@@ -28,6 +29,12 @@ const router = new VueRouter({
       path: '/book/:id',
       name: 'Leitura',
       component: Book,
+      props: true
+    },
+    {
+      path: '/author/:id',
+      name: 'Autor',
+      component: Author,
       props: true
     },
     {

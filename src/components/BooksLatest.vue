@@ -1,6 +1,11 @@
 <template>
-  <div id="book-latest" >
-    <v-card :to="{name:'Leitura', params: { id: lastBook.id }}" class="mx-auto" max-width="60">
+  <div id="book-latest">
+    <v-card
+      :loading="!img"
+      :to="{ name: 'Leitura', params: { id: currentBook.id } }"
+      class="mx-auto"
+      max-width="60"
+    >
       <v-img :src="img" />
     </v-card>
   </div>
@@ -10,20 +15,25 @@ import { mapActions } from "vuex";
 import { downloadIMG } from "@/services/storage";
 
 export default {
-  data: () => ({ lastBook: [], img: "" }),
+  data: () => ({ img: "" }),
+  computed: {
+    currentBook(){
+      return this.$store.state.book.currentBook
+    }
+  },
   methods: {
     ...mapActions(["fetchLastBook"]),
   },
   async mounted() {
-    this.lastBook = await this.fetchLastBook()
-    this.img = await downloadIMG(this.lastBook)
-  }
+    await this.fetchLastBook();
+    this.img = await downloadIMG(this.currentBook);
+  },
 };
 </script>
 <style>
-  #book-latest{
-    cursor: pointer;
-    right: 0;
-    padding-right: 5px;
-  } 
+#book-latest {
+  cursor: pointer;
+  right: 0;
+  padding-right: 5px;
+}
 </style>

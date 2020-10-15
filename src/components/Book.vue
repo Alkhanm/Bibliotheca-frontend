@@ -3,7 +3,7 @@
     <v-card id="library" dark class="mx-auto pa-2" max-width="1000" :loading="loading">
       <v-card-title>
         <span>
-          <span class="text-capitalize">{{ book.title }}</span> [
+          <span class="text-capitalize">{{ book.title }} <v-icon>edit</v-icon></span> [
           {{ status.name }} ]
           <v-progress-linear
             v-if="hasPDF"
@@ -26,7 +26,7 @@
           <v-btn large fab loading></v-btn>
           <p class="mr-2">Aguarde...</p>
         </div>
-        <template v-else-if="hasPDF">
+        <template v-else-if="pdfURL">
           <v-img
             @click="openBook(true)"
             :src="imgURL"
@@ -61,13 +61,17 @@ import { downloadPDF, downloadIMG } from "@/services/storage";
 
 export default {
   name: "Book",
+  props: { id: { type: Number, required: false } },
   components: { BookActions, PDFReader },
   data: () => ({ pdfURL: "", imgURL: "", loading: null }),
   computed: {
     ...mapGetters(["getBookById"]),
     book() {
-      const id = this.$route.params.id;
-      return this.getBookById(id);
+      // Busca no store o livro q possua esse id
+      const book = this.getBookById(this.id)
+      // Ou busque o último livro
+      if (!book) return this.$store.state.book.currentBook
+      return book
     },
     categories() {
       const cat = this.book?.author?.list?.categories;
@@ -112,6 +116,9 @@ export default {
         this.loading = false;
       }
     },
+    editTitle(){
+      alert(1)
+    }
   },
   async created() {
     if (!this.book) this.$router.push({ name: "Listas" });

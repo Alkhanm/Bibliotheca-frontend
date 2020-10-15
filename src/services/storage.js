@@ -67,7 +67,7 @@ export async function downloadBook({ path }) {
         console.error(err)
     }
 }
-export async function deleteArchive({ path }) {
+export async function deleteArchive(path) {
     try {
         const ref = storage().ref().child(path)
         await ref.delete()

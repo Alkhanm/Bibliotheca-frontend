@@ -3,13 +3,20 @@ import { BOOK } from "@/services/api/url"
 import { deleteArchive } from "@/services/storage"
 
 export default {
-    state: { arr: [], loading: false },
+    state: { 
+        arr: [], 
+        currentBook: null, 
+        loading: false 
+    },
     mutations: {
         addAllBooks(state, books) {
             state.arr.push(...books)
         },
         addBook(state, book) {
             state.arr.push(book)
+        },
+        addCurrentBook(state, book){
+            state.currentBook = book
         },
         removeBook({ arr }, { id }) {
             const book = arr.find(book => book.id === id)
@@ -26,7 +33,6 @@ export default {
                 dispatch("notify", { ...err, time: 5000 })
             }
         },
-        
         async saveBook({ commit, dispatch }, book) {
             try {
                 const response = await http.post(BOOK.URL, book)
@@ -37,11 +43,12 @@ export default {
             }
         },
 
-        async deleteBook({ commit, dispatch }, book) {
+        async deleteBook({ commit, dispatch }, { id, path }) {
             try {
-                await http.delete(`${BOOK.URL}/${book.id}`)
-                await deleteArchive(book)
-                commit("removeBook", book)
+                await http.delete(`${BOOK.URL}/${id}`)
+                await deleteArchive(path)
+                await deleteArchive(path + "-img")
+                commit("removeBook", { id })
             } catch (err) {
                 dispatch("notify", { ...err, time: 5000 })
             }
@@ -51,16 +58,14 @@ export default {
             commit("removeBook", book)
             commit("addBook", book)
         },
-        async fetchLastBook(context) {
+        async fetchLastBook({ commit }) {
             const response = await http.get(`${BOOK.URL}/last`)
-            const book = response.data[0]
-            const isLast = context.state.arr.find(b => b === book)
-            if (!isLast) context.commit("addBook", book)
-            return book
+            const book = response.data
+            commit("addCurrentBook", book)
         },
     },
     getters: {
         getBooksByAuthor: ({ arr }) => ({ id }) => arr.filter(book => book.author.id === id),
-        getBookById: ({ arr }) => (id) => arr.find(book => book.id === id),
+        getBookById: ({ arr }) => ( id ) => arr.find(book => book.id === id),
     }
 }

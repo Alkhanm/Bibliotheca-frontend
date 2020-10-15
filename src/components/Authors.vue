@@ -1,11 +1,10 @@
 <template>
   <v-list>
-    <v-list-group
-      prepend-icon="account_circle"
-      v-for="author in author"
-      :key="author.id"
-    >
+    <v-list-group v-for="author in author" :key="author.id">
       <template v-slot:activator>
+        <v-btn :to="{ name: 'Autor', params: { id: author.id } }" text small class="mr-2">
+          <v-icon>collections_bookmark</v-icon>
+        </v-btn>
         <v-list-item-title v-text="author.name" />
       </template>
       <Books :author="author"></Books>

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="opened" scrollable eager fullscreen>
+  <v-dialog v-model="opened" eager scrollable fullscreen>
     <v-card dark class="mx-auto" :loading="loading">
       <v-card-text
         v-show="!loading"
@@ -13,39 +13,38 @@
         <canvas class="mx-auto" id="the-canvas"></canvas>
         <div id="space-between"></div>
       </v-card-text>
-      <v-bottom-navigation dark :input-value="showBottom" fixed hide-on-scroll>
-        <v-spacer class="space"></v-spacer>
-        <v-btn fab x-small @click="increase()">
-          <v-icon>add</v-icon>
-        </v-btn>
-        <v-btn fab x-small @click="decrease()">
-          <v-icon>remove</v-icon>
-        </v-btn>
-        <v-btn @click="prev()">
-          <span>Anterior</span>
-          <v-icon>navigate_before</v-icon>
-        </v-btn>
-        <v-slider
-          @change="pageNum = slider"
-          v-model="slider"
-          class="counter mt-7"
-          color="blue"
-          min="1"
-          thumb-size="24"
-          thumb-label="always"
-          :max="totalPages"
-        />
-        <v-btn @click="next()">
-          <span>Próximo</span>
-          <v-icon>navigate_next</v-icon>
-        </v-btn>
-        <span class="mt-7">{{ `${pageNum}/${totalPages}` }}</span>
-        <v-btn x-small @click="close()">
-          <span class="mr-2">Sair</span>
-          <v-icon>keyboard_return</v-icon>
-        </v-btn>
-        <v-spacer class="space"></v-spacer>
-      </v-bottom-navigation>
+      <transition name="up">
+        <div id="bottom" v-show="showBottom">
+          <v-spacer class="space"></v-spacer>
+          <v-btn @click="increase()" class="zoom">
+            <v-icon small>add</v-icon>
+          </v-btn>
+          <v-btn @click="decrease()" class="zoom">
+            <v-icon small>remove</v-icon>
+          </v-btn>
+          <v-btn @click="prev()">
+            <v-icon>navigate_before</v-icon>
+          </v-btn>
+          <v-slider
+            v-model="slider"
+            @change="pageNum = slider"
+            class="counter mt-7"
+            color="blue"
+            min="1"
+            thumb-size="26"
+            thumb-label="always"
+            :max="totalPages"
+          />
+          <v-btn @click="next()">
+            <v-icon>navigate_next</v-icon>
+          </v-btn>
+          <span class="mt-5">{{ `${pageNum}/${totalPages}` }}</span>
+          <v-btn @click="close()">
+            <v-icon>keyboard_return</v-icon>
+          </v-btn>
+          <v-spacer class="space"></v-spacer>
+        </div>
+      </transition>
     </v-card>
   </v-dialog>
 </template>
@@ -66,7 +65,7 @@ export default {
       pdf: {},
       showOptions: false,
       slider: 0,
-      scale: 2.9,
+      scale: 2.8,
       pageNum: 0,
       totalPages: 0,
       loading: true,
@@ -92,15 +91,17 @@ export default {
       if (!this.pageRendering) this.getPage(this.pageNum);
     },
     prev() {
-      if (this.pageNum > 1) this.pageNum--;
+      if (this.pageNum > 1 && !this.pageRendering) this.pageNum--;
     },
     next() {
-      if (this.pageNum < this.totalPages) this.pageNum++;
+      if (this.pageNum < this.totalPages && !this.pageRendering) this.pageNum++;
     },
     movePageOnTouch(event) {
       const container = document.getElementById("canvas-container");
-      const top = container.scrollTop;
-      const topMax = container.scrollHeight - container.clientHeight;
+      const top = Math.floor(container.scrollTop) + 10;
+      const topMax =
+        container.scrollTopMax ||
+        container.scrollHeight - container.clientHeight;
       const valueOfPercent = 40;
       const percent = (screen.height / 100) * valueOfPercent;
       const firstTouch = this.firstTouch.touches[0].clientY;
@@ -123,10 +124,10 @@ export default {
     async prepareReading() {
       try {
         this.pdf = await renderPDF(this.pdfURL);
-        this.totalPages = this.pdf.numPages;
+        this.totalPages = this.book.totalPages;
         this.slider = this.pageNum = this.book.currentPage;
       } catch (err) {
-        console.error(err)
+        console.error(err);
       } finally {
         this.loading = false;
       }
@@ -162,11 +163,11 @@ export default {
   watch: {
     async pageNum(newValue) {
       if (!this.pageRendering) {
-        await this.getPage(newValue);
-        this.slider = newValue;
         const canvas = document.getElementById("the-canvas");
-        canvas.scrollIntoView({ behavior: "smooth", inline: "end" });
+        canvas.scrollIntoView({ behavior: "smooth" });
         this.showBottom = true;
+        await this.getPage(newValue)
+        this.slider = newValue;
       }
     },
   },
@@ -177,6 +178,25 @@ export default {
 </script>
 
 <style>
+#the-canvas {
+  width: 100%;
+}
+#bottom {
+  display: flex;
+  height: 56px;
+  width: 100%;
+  position: fixed;
+  background-color: #2e2e2e;
+  bottom: 0;
+  z-index: 4;
+}
+
+#bottom button {
+  height: 100%;
+  background-color: transparent;
+  box-shadow: none;
+}
+
 #space-between {
   height: 50px;
 }
@@ -189,15 +209,26 @@ export default {
 }
 @media (max-width: 600px) {
   .counter {
-    display: none !important;
+    display: none;
+  }
+  .zoom {
+    display: none;
   }
 }
-@media (display-mode: fullscreen) {
-}
-
 @media (max-width: 1200px) {
   .space {
     display: none;
   }
+}
+
+.up-enter-active,
+.up-leave-active {
+  transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.5, 1);
+}
+.up-enter,
+.up-leave-to {
+  opacity: 0;
+  transform: translateY(56px);
 }
 </style>

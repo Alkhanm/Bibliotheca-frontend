@@ -15,34 +15,30 @@ export async function renderPDF(pdf) {
 * que irá representar essa página (no caso um canvas), e a escala de zoom desta página.
 * Se nem um id for passado, ele irá buscar esse elemento e irá renderizar a página nela, 
 * se não for irá criar um novo elemento no DOM */
-export async function renderPage(pdf, numPage, id, scale = 2) {
-
+export async function renderPage(pdf, numPage, id, scale = 4) {
+  const page = await pdf.getPage(numPage);
+  const viewport = page.getViewport({ scale });
+  
+  const canvas = id ? document.getElementById(id) : document.createElement("canvas")
+  
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  
   const scales = { 1: 3.3, 2: 4 };
   const defaultScale = 4;
   const scaleFromDevice = scales[window.devicePixelRatio] || defaultScale;
-
-  const page = await pdf.getPage(numPage);
-  const viewport = page.getViewport({ scale });
-
-  const canvas = id ? document.getElementById(id) : document.createElement("canvas")
-
-  const context = canvas.getContext("2d");
-
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
-
-  const displayWidth = 1.7;
+  const displayWidth = 2.5;
   canvas.style.width = `${(viewport.width * displayWidth) / scaleFromDevice}px`;
   canvas.style.height = `${(viewport.height * displayWidth) / scaleFromDevice}px`;
 
   const renderContext = {
-    canvasContext: context,
+    canvasContext: canvas.getContext("2d"),
     viewport: viewport
   };
-
-  const renderTask = page.render(renderContext);
+  const renderTask = page.render(renderContext)
 
   await renderTask.promise;
+
   return canvas
 }
 
@@ -51,7 +47,7 @@ export async function renderPage(pdf, numPage, id, scale = 2) {
 export async function getBookCover(file) {
   const pdf = await renderPDF(file)
   const page = await renderPage(pdf, 1)
-  const img = page.toDataURL("img/jpeg", 0.5)
+  const img = page.toDataURL("image/jpeg", 0.1)
   const numPages = pdf.numPages
   return { img, numPages }
 }

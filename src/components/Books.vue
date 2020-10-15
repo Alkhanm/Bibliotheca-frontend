@@ -1,9 +1,9 @@
 <template>
   <v-list id="list-book">
-    <v-list-item v-for="book in books" :key="book.id" active-class sub-group>
-      <v-icon class="pa-2">book</v-icon>
-      <v-list-item-title>{{book.title}}</v-list-item-title>
-      <v-btn :to="{ name:'Leitura', params: {id: book.id} }">abrir</v-btn>
+    <v-list-item v-for="book in books" :key="book.id" sub-group class="mr-5 ml-5">
+      <v-icon class="ma-2">book</v-icon>
+      <v-list-item-title>{{ book.title }}</v-list-item-title>
+      <v-btn :to="{ name:'Leitura', params: { id: book.id } }">abrir</v-btn>
     </v-list-item>
     <v-list-item v-if="loading">
       <v-btn text loading block></v-btn>
