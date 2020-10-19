@@ -2,11 +2,16 @@
   <div>
     <v-toolbar dark>
       <v-toolbar-title>
-        <h2 @click="$router.go({name: 'Listas'})" class="header-title text-uppercase">Libros</h2>
+        <h1
+          @click="$router.go({ name: 'Listas' })"
+          class="title text-uppercase"
+        >
+          Bibliotheca
+        </h1>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <h3 class="text-capitalize">{{getUsername}}</h3>
+      <h3 class="text-capitalize">{{ getUsername }}</h3>
 
       <v-btn icon @click="signout()">
         <v-icon>mdi-export</v-icon>
@@ -32,12 +37,16 @@ export default {
 };
 </script>
 <style>
+.title {
+  user-select: none;
+}
+.title:hover {
+  cursor: pointer;
+  opacity: 0.9;
+}
+
 .header-card {
   display: flex;
   flex-direction: column;
-}
-h2:hover {
-  cursor: pointer;
-  opacity: 0.7;
 }
 </style>

@@ -1,5 +1,4 @@
 <template>
-  <v-container>
     <v-card class="mx-auto mb-3" max-width="1000" dark>
       <v-container fluid>
         <template v-if="isRegistredUser">
@@ -14,7 +13,6 @@
         </div>
       </v-container>
     </v-card>
-  </v-container>
 </template>
 
 <script>

@@ -1,10 +1,17 @@
 <template>
-  <v-container>
-    <v-card id="library" dark class="mx-auto pa-2" max-width="1000" :loading="loading">
+    <v-card
+      id="library"
+      dark
+      class="mx-auto pa-2 library"
+      max-width="1000"
+      :loading="loading"
+    >
       <v-card-title>
         <span>
-          <span class="text-capitalize">{{ book.title }} <v-icon>edit</v-icon></span> [
-          {{ status.name }} ]
+          <span class="text-capitalize"
+            >{{ book.title }}
+          </span>
+          [{{ status.name }} ]
           <v-progress-linear
             v-if="hasPDF"
             :value="status.value"
@@ -15,8 +22,8 @@
           </v-progress-linear>
         </span>
       </v-card-title>
-      <v-card-subtitle class="text-capitalize">
-        {{ book.author.name }}
+      <v-card-subtitle class="text-capitalize pt-2">
+        <v-chip :to="{ name: 'Autor', params: { id: book.author.id } }" outlined>{{ book.author.name }}</v-chip>
       </v-card-subtitle>
 
       <v-divider></v-divider>
@@ -27,19 +34,13 @@
           <p class="mr-2">Aguarde...</p>
         </div>
         <template v-else-if="pdfURL">
-          <v-img
-            @click="openBook(true)"
-            :src="imgURL"
-            class="image-book"
-            max-width="30%"
-          />
-          <PDFReader :book="book" :pdfURL="pdfURL"></PDFReader>
+          <PDFReader :book="book" :pdfURL="pdfURL" :imgURL="imgURL"></PDFReader>
         </template>
         <p id="text-about-book" class="text-start pl-5 pr-5">
           {{ book.about }}
         </p>
         <span class="text-end">
-          <div>Lista: {{book.author.list.name}} </div>
+          <div>Lista: {{ book.author.list.name }}</div>
           <div>Categorias: {{ categories }}</div>
           <div>Última leitura: {{ lastReading }}</div>
         </span>
@@ -47,31 +48,34 @@
 
       <v-divider></v-divider>
 
-      <BookActions @addedPDF="getArchives()" @loading="loading = $event" :book="book"></BookActions>
+      <BookActions
+        @addedPDF="getArchives()"
+        @loading="loading = $event"
+        :book="book"
+      ></BookActions>
     </v-card>
-  </v-container>
 </template>
 
 <script>
-import BookActions from "./BookActions";
-import { READING_STATUS as status } from "@/services/enums";
-import PDFReader from "./PDFReader";
 import { mapGetters, mapMutations } from "vuex";
+import { READING_STATUS as status } from "@/services/enums";
 import { downloadPDF, downloadIMG } from "@/services/storage";
+import BookActions from "./BookActions";
+import PDFReader from "./PDFReader";
 
 export default {
   name: "Book",
-  props: { id: { type: Number, required: false } },
+  props: { id: { type: Number, required: false }},
   components: { BookActions, PDFReader },
   data: () => ({ pdfURL: "", imgURL: "", loading: null }),
   computed: {
     ...mapGetters(["getBookById"]),
     book() {
       // Busca no store o livro q possua esse id
-      const book = this.getBookById(this.id)
+      const book = this.getBookById(this.id);
       // Ou busque o último livro
-      if (!book) return this.$store.state.book.currentBook
-      return book
+      if (!book) return this.$store.state.book.currentBook;
+      return book;
     },
     categories() {
       const cat = this.book?.author?.list?.categories;
@@ -80,13 +84,17 @@ export default {
         : "Sem catégorias";
     },
     lastReading() {
-      const lastReading = this.book.lastReading
-      if (!lastReading) return
-      const date = new Date(lastReading);
-      return date.toLocaleString().split(" ").reverse().join(" ");
+      const last = new Date(this.book.lastReading);
+      return last.toLocaleString().split(" ").reverse().join(" ");
     },
     statusColor() {
-      const colorsOptions = ["#BDBDBD", "#80D8FF", "#00B0FF", "info", "success"];
+      const colorsOptions = [
+        "#BDBDBD",
+        "#80D8FF",
+        "#00B0FF",
+        "info",
+        "success",
+      ];
       const colorNumber = Math.min(
         (this.status.value / 100) * colorsOptions.length,
         colorsOptions.length - 1
@@ -96,12 +104,16 @@ export default {
     },
     status() {
       const name = this.book.readingStatus;
-      const value = name === status.COMPLETED ? 100 : (this.book.currentPage / this.book.totalPages) * 100;
+      const value =
+        name === status.COMPLETED
+          ? 100
+          : (this.book.currentPage / this.book.totalPages) * 100;
       return { name, value };
     },
     hasPDF() {
       return !!this.book.path;
     },
+
   },
   methods: {
     ...mapMutations(["openBook"]),
@@ -116,16 +128,14 @@ export default {
         this.loading = false;
       }
     },
-    editTitle(){
-      alert(1)
-    }
   },
-  async created() {
-    if (!this.book) this.$router.push({ name: "Listas" });
+  async mounted() {
+    if (!this.book.id) this.$router.push({ path: "/menu" });
     if (this.hasPDF) await this.getArchives();
   },
 };
 </script>
+
 <style>
 #content {
   display: flex;

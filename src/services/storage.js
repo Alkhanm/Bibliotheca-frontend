@@ -12,13 +12,12 @@ export function createPath(book) {
     return path;
 }
 
-export async function uploadBook({ path, file }) {
+export function uploadBook({ path, file }) {
     try {
         const ref = storage().ref()
         const child = ref.child(path)
-        return await child.put(file)
-    }
-    catch (err) {
+        return child.put(file)
+    } catch (err) {
         store.dispatch("notify", { ...err, message: "Erro ao fazer upload do arquivo", time: 4000, type: "warning" })
         console.error(err)
     }
@@ -28,7 +27,7 @@ export async function uploadImg({ path, imgDataURL }) {
         const ref = storage().ref()
         const child = ref.child(path + "-img")
         const dataUrl = imgDataURL.split(",")[1]
-        return await child.putString(dataUrl, "base64", { contentType: 'image/jpeg' })
+        await child.putString(dataUrl, "base64", { contentType: 'image/jpeg' })
     } catch (err) {
         store.dispatch("notify", { ...err, message: "Erro ao fazer upload do arquivo", time: 4000, type: "warning" })
         console.error("Não foi possivel salvar um imagem deste livro.", err)
@@ -73,5 +72,18 @@ export async function deleteArchive(path) {
         await ref.delete()
     } catch (err) {
         console.error("Não foi possivel deletar o arquivo associado.", err)
+    }
+}
+export async function deleteArchives(path) {
+    try {
+        const ref = storage().ref()
+        const child = ref.child(path)
+        const refs = await child.listAll()
+        const items = refs.items
+        items.forEach(async item => {
+            await ref.child(item.location.path).delete()
+        })
+    } catch (err) {
+        console.error("Não foi possivel deletar os arquivos associados.", err)
     }
 }

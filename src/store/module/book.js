@@ -5,7 +5,7 @@ import { deleteArchive } from "@/services/storage"
 export default {
     state: { 
         arr: [], 
-        currentBook: null, 
+        currentBook: { id: 0, img: "", path:"" }, 
         loading: false 
     },
     mutations: {
@@ -24,6 +24,7 @@ export default {
         },
     },
     actions: {
+        //Recebe um author como parametros, e busca na API pelos livros dele.
         async fetchBooks({ commit, dispatch }, { id }) {
             try {
                 const response = await http.get(BOOK.URL, { params: { author: id } })
@@ -46,8 +47,10 @@ export default {
         async deleteBook({ commit, dispatch }, { id, path }) {
             try {
                 await http.delete(`${BOOK.URL}/${id}`)
-                await deleteArchive(path)
-                await deleteArchive(path + "-img")
+                if (path) {
+                    await deleteArchive(path)
+                    await deleteArchive(path + "-img")
+                }
                 commit("removeBook", { id })
             } catch (err) {
                 dispatch("notify", { ...err, time: 5000 })
@@ -61,7 +64,7 @@ export default {
         async fetchLastBook({ commit }) {
             const response = await http.get(`${BOOK.URL}/last`)
             const book = response.data
-            commit("addCurrentBook", book)
+            if (book) commit("addCurrentBook", book)
         },
     },
     getters: {

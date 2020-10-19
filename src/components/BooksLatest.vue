@@ -26,7 +26,8 @@ export default {
   },
   async mounted() {
     await this.fetchLastBook();
-    this.img = await downloadIMG(this.currentBook);
+    if (this.currentBook.path) 
+      this.img = await downloadIMG(this.currentBook);
   },
 };
 </script>

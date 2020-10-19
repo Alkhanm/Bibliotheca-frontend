@@ -1,8 +1,26 @@
 <template>
-  <v-dialog v-model="opened" eager scrollable fullscreen>
+  <v-dialog
+    id="pdf-reader"
+    v-model="open"
+    fullscreen
+    eager
+    attach="#library"
+    scrollable
+  >
+    <template v-slot:activator="{ on, attrs }">
+      <v-img
+        v-bind="attrs"
+        v-on="on"
+        :src="imgURL"
+        class="image-book"
+        max-width="30%"
+      />
+    </template>
     <v-card dark class="mx-auto" :loading="loading">
+      <span v-if="loading" class="load-button">
+        <v-btn class="ma-2" fab loading></v-btn>
+      </span>
       <v-card-text
-        v-show="!loading"
         @scroll="showBottomOnScroll($event)"
         @touchstart="firstTouch = $event"
         @touchend="movePageOnTouch($event)"
@@ -15,7 +33,7 @@
       </v-card-text>
       <transition name="up">
         <div id="bottom" v-show="showBottom">
-          <v-spacer class="space"></v-spacer>
+          <div class="space"></div>
           <v-btn @click="increase()" class="zoom">
             <v-icon small>add</v-icon>
           </v-btn>
@@ -33,16 +51,20 @@
             min="1"
             thumb-size="26"
             thumb-label="always"
-            :max="totalPages"
-          />
+            :max="book.totalPages"
+          >
+          </v-slider>
           <v-btn @click="next()">
             <v-icon>navigate_next</v-icon>
           </v-btn>
-          <span class="mt-5">{{ `${pageNum}/${totalPages}` }}</span>
+          <span class="mt-5">{{ `${pageNum}/${book.totalPages}` }}</span>
+          <v-btn @click="toggleFullscreen()" class="full-screen-bottom">
+            <v-icon>aspect_ratio</v-icon>
+          </v-btn>
           <v-btn @click="close()">
             <v-icon>keyboard_return</v-icon>
           </v-btn>
-          <v-spacer class="space"></v-spacer>
+          <div class="space"></div>
         </div>
       </transition>
     </v-card>
@@ -52,31 +74,31 @@
 <script>
 import { mapActions, mapMutations } from "vuex";
 import { renderPDF, renderPage } from "@/services/PdfService";
-import { READING_STATUS } from "@/services/enums";
 
 export default {
   name: "PDFReader",
   props: {
     book: { type: Object, required: true },
     pdfURL: { type: String, required: true },
+    imgURL: { type: String, required: true },
   },
   data() {
     return {
       pdf: {},
       showOptions: false,
       slider: 0,
-      scale: 2.8,
+      scale: 2.7,
       pageNum: 0,
-      totalPages: 0,
       loading: true,
       pageRendering: false,
       firstTouch: "",
-      showBottom: window.screen.width > 500 ? true : false,
+      showBottom: true,
+      open: false,
     };
   },
   computed: {
-    opened() {
-      return this.$store.state.open;
+    isSmallDevice() {
+      return window.screen.height / window.devicePixelRatio < 500;
     },
   },
   methods: {
@@ -94,15 +116,17 @@ export default {
       if (this.pageNum > 1 && !this.pageRendering) this.pageNum--;
     },
     next() {
-      if (this.pageNum < this.totalPages && !this.pageRendering) this.pageNum++;
+      if (this.pageNum < this.book.totalPages && !this.pageRendering)
+        this.pageNum++;
     },
     movePageOnTouch(event) {
       const container = document.getElementById("canvas-container");
-      const top = Math.floor(container.scrollTop) + 10;
+      const top = Math.floor(container.scrollTop);
       const topMax =
         container.scrollTopMax ||
         container.scrollHeight - container.clientHeight;
-      const valueOfPercent = 40;
+      if (top != 0 && top != topMax) return;
+      const valueOfPercent = 50;
       const percent = (screen.height / 100) * valueOfPercent;
       const firstTouch = this.firstTouch.touches[0].clientY;
       const lastTouch = event.changedTouches[0].clientY;
@@ -124,7 +148,6 @@ export default {
     async prepareReading() {
       try {
         this.pdf = await renderPDF(this.pdfURL);
-        this.totalPages = this.book.totalPages;
         this.slider = this.pageNum = this.book.currentPage;
       } catch (err) {
         console.error(err);
@@ -139,7 +162,7 @@ export default {
         container.scrollHeight - container.clientHeight
       );
       //Para telas pequenas, a barra se opções será oculta na navegação
-      if (top < topMax && screen.height < 500) this.showBottom = false;
+      if (top < topMax && this.isSmallDevice) this.showBottom = false;
       //Ao chegar no fim da página, mostre a barra
       if (top > topMax - 55 || top === 0) this.showBottom = true;
     },
@@ -151,36 +174,41 @@ export default {
       );
       if (top !== topMax) this.showBottom = value;
     },
-    close() {
-      this.openBook(false);
+    async exitFullscreen() {
+      if (document.fullscreenElement) document.exitFullscreen();
+    },
+    toggleFullscreen() {
+      if (!document.fullscreenElement)
+        document.documentElement.requestFullscreen();
+      else this.exitFullscreen();
+    },
+    async close() {
+      await this.exitFullscreen()
+      this.open = false;
       const book = { ...this.book };
       book.lastReading = Date.now();
       book.currentPage = this.pageNum;
-      if (!book.readingStatus) book.readingStatus = READING_STATUS.READING;
       this.updateBook(book);
     },
   },
   watch: {
-    async pageNum(newValue) {
+    async pageNum(value) {
       if (!this.pageRendering) {
         const canvas = document.getElementById("the-canvas");
-        canvas.scrollIntoView({ behavior: "smooth" });
+        canvas.scrollIntoView({ inline: "center" });
         this.showBottom = true;
-        await this.getPage(newValue)
-        this.slider = newValue;
+        await this.getPage(value);
+        this.slider = value;
       }
     },
   },
-  mounted() {
-    this.prepareReading();
+  async mounted() {
+    await this.prepareReading();
   },
 };
 </script>
 
-<style>
-#the-canvas {
-  width: 100%;
-}
+<style scoped>
 #bottom {
   display: flex;
   height: 56px;
@@ -189,6 +217,7 @@ export default {
   background-color: #2e2e2e;
   bottom: 0;
   z-index: 4;
+  justify-content: space-between;
 }
 
 #bottom button {
@@ -197,8 +226,11 @@ export default {
   box-shadow: none;
 }
 
+.space {
+  width: 15%;
+}
 #space-between {
-  height: 50px;
+  height: 56px;
 }
 .page-count {
   display: flex;
@@ -206,6 +238,13 @@ export default {
 }
 .image-book {
   cursor: pointer;
+}
+.load-button {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
 }
 @media (max-width: 600px) {
   .counter {
@@ -220,7 +259,6 @@ export default {
     display: none;
   }
 }
-
 .up-enter-active,
 .up-leave-active {
   transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
@@ -231,4 +269,4 @@ export default {
   opacity: 0;
   transform: translateY(56px);
 }
-</style>
+</style> >

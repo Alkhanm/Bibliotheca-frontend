@@ -2,7 +2,9 @@
   <v-app id="app">
     <TheHeader />
     <v-main id="app-main">
-      <router-view></router-view>
+      <v-container fluid>
+        <router-view></router-view>
+      </v-container>
     </v-main>
     <div v-show="info" id="alert-info">
       <v-alert
@@ -29,6 +31,7 @@ export default {
   mounted() {
     const userLocal = localStorage.getItem(USER_KEY);
     if (userLocal) this.$store.commit("addUser", JSON.parse(userLocal));
+    window.scrollTo(0,200)
   },
 };
 </script>

@@ -1,49 +1,46 @@
 <template>
-  <v-container fluid>
-    <v-card max-width="1000px" class="grey darken-2 mx-auto">
-        <v-card dark>
-          <v-card-actions>
-            <v-btn @click="newList()" class="grey darken-2">
-              <v-icon :color="create ? 'success' : 'info'">library_add</v-icon
-              >Nova
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-text-field
-              v-model="search"
-              clearable
-              dense
-              single-line
-              prepend-icon="search"
-              hint="Buscar listas por nome ou categoria"
-              label="Pesquisar lista"
-              class="pa-3"
-            />
-            <v-spacer></v-spacer>
-            <BookLatest></BookLatest>
-          </v-card-actions>
-          <v-card-text v-show="search" class="text-center">
-            <span class="subtitle-1">
-              <strong>Resultados:</strong>
-              {{ filtredList.length }} de {{ lists.length }}
-            </span>
-          </v-card-text>
-        </v-card>
-      <ListNew v-show="create"> </ListNew>
-
-      <List
-        @searchFor="search = $event"
-        v-for="list in filtredList"
-        :key="list.id"
-        :list="list"
-        class="mt-7"
-      >
-      </List>
+  <v-card max-width="1000px" class="grey darken-2 mx-auto">
+    <v-card dark>
+      <v-card-actions>
+        <v-btn @click="newList()" class="grey darken-2">
+          <v-icon :color="create ? 'success' : 'info'">library_add</v-icon>Nova
+        </v-btn>
+        <v-spacer></v-spacer>
+        <v-text-field
+          v-model="search"
+          clearable
+          dense
+          single-line
+          prepend-icon="search"
+          hint="Buscar listas por nome ou categoria"
+          label="Pesquisar lista"
+          class="pa-3"
+        />
+        <v-spacer></v-spacer>
+        <BookLatest></BookLatest>
+      </v-card-actions>
+      <v-card-text v-show="search" class="text-center">
+        <span class="subtitle-1">
+          <strong>Resultados:</strong>
+          {{ filtredList.length }} de {{ lists.length }}
+        </span>
+      </v-card-text>
     </v-card>
+    <ListNew v-show="create"> </ListNew>
+
+    <List
+      @searchFor="search = $event"
+      v-for="list in filtredList"
+      :key="list.id"
+      :list="list"
+      class="mt-7"
+    >
+    </List>
     <v-btn v-if="loading" block loading text></v-btn>
-    <v-alert class="mt-4" v-else-if="!lists.length" text type="info">
-      Nenhuma lista foi salva ainda.
+    <v-alert text dense dark v-else-if="!lists.length">
+      Nenhuma lista foi salva ainda
     </v-alert>
-  </v-container>
+  </v-card>
 </template>
 
 <script>
@@ -98,6 +95,5 @@ export default {
 .top-menu {
   display: flex;
 }
-
 </style>
 

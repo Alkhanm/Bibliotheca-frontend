@@ -16,3 +16,6 @@ export default function retira_acentos(text) {
     }
     return novastr.toLocaleLowerCase().trim()
 }
+
+
+

@@ -1,45 +1,63 @@
-<template>
-  <v-dialog v-model="dialog" persistent max-width="500px">
+<template> 
+  <v-dialog id="book-new" v-model="dialog" persistent max-width="600" >
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" v-on="on" fab small>
+      <v-btn text v-bind="attrs" v-on="on">
         <v-icon>book</v-icon>
       </v-btn>
     </template>
-    <v-card dark class="grey darken-4">
+    <v-card dark class="grey darken-4" max-height="450">
+      <v-progress-linear
+        height="13"
+        color="success"
+        background-opacity="0.5"
+        :buffer-value="progressUpload"
+      ></v-progress-linear>
       <v-card-title>
-        <p class="headline text-center">Novo Livro</p>
+        <h2 class="headline text-center">Novo Livro</h2>
       </v-card-title>
+      <v-btn
+        @click="dialog = false"
+        :disabled="!loading"
+        class="close-button"
+        icon
+        text
+      >
+        <v-icon>expand_more</v-icon>
+      </v-btn>
       <v-card-text>
         <v-text-field
           v-model="book.title"
           autofocus
           label="Título"
-          hint="Edite o título deste livro aqui."
+          hint="Adicione o título do novo livro aqui."
           persistent-hint
           clearable
           class="mb-5"
         />
-        <v-text-field
-          v-model="author.name"
-          list="author-field"
-          label="Author e/ou serie (opcional)"
-          hint="Nome do autor (ou serie) a qual o livro pertence. "
-        >
-        </v-text-field>
-        <datalist id="author-field">
-          <option
-            v-for="author in authors"
-            :key="author.id"
-            class="author-option pa-5"
-            :value="author.name"
-          />
-        </datalist>
+        <template v-if="!author.id">
+          <v-text-field
+            v-model="author.name"
+            list="author-field"
+            label="Author e/ou serie (opcional)"
+            hint="Nome do autor (ou serie) a qual o livro pertence. "
+          >
+          </v-text-field>
+          <datalist id="author-field">
+            <option
+              v-for="author in authors"
+              :key="author.id"
+              class="author-option pa-5"
+              :value="author.name"
+            />
+          </datalist>
+        </template>
 
         <!-- Upload do livro -->
         <v-file-input
           @change="getAuxiliaryName()"
           class="mb-4"
           v-model="file"
+          validate-on-blur
           show-size
           label="Incluir arquivo"
           :rules="ruleFile"
@@ -47,26 +65,21 @@
           persistent-hint
         >
         </v-file-input>
-        <v-row>
-          <v-col cols="12" sm="6">
+        <v-row class="pb-0 mb-0">
+          <v-col class="pa-2" cols="12" sm="6">
             <v-btn
               @click="add()"
               :loading="loading"
               :disabled="!isValid"
               block
               class="grey darken-3"
+              append
             >
               Salvar
             </v-btn>
           </v-col>
-          <v-col>
-            <v-btn
-              @click="(dialog = false), (book = {}), (loading = false)"
-              block
-              class="grey darken-3"
-            >
-              Fechar
-            </v-btn>
+          <v-col class="pa-2" cols="12" sm="6">
+            <v-btn @click="close()" block class="grey darken-3"> Fechar </v-btn>
           </v-col>
         </v-row>
       </v-card-text>
@@ -76,19 +89,27 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { getBookCover, getAuxiliaryName } from "@/services/PdfService";
 import { uploadBook, uploadImg, createPath } from "@/services/storage";
-import { getBookCover } from "@/services/PdfService";
 
 export default {
   name: "BookNew",
-  props: { list: Object },
+  props: {
+    list: Object,
+    author: {
+      type: Object,
+      default: () => ({
+        id: 0,
+        name: "",
+      }),
+    },
+  },
   data() {
     return {
-      items: ["foo", "bar", "fizz", "buzz"],
       dialog: false,
       loading: false,
+      progressUpload: 0,
       book: {},
-      author: { list: this.list },
       file: null,
       ruleFile: [
         (v) =>
@@ -101,64 +122,84 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getAuthorByName"]),
+    ...mapGetters(["getAuthorByName", "getAuthorsByList"]),
     isValid() {
       if (this.file && this.file.type !== "application/pdf") return false;
-      return this.book.title;
+      return !!this.book.title;
     },
     authors() {
-      const authors = this.$store.state.author.arr;
-      if (!authors.length) this.fetchAuthors(this.list)
+      const authors = this.getAuthorsByList(this.list);
       return authors;
     },
   },
   methods: {
     ...mapActions(["saveBook", "saveAuthor", "fetchAuthors"]),
-    getAuxiliaryName(){
-      if (this.book.name) return
-      const fileName = this.file.name
-      // ^&‘{}[],!–?()
-      const regExp = /.pdf$|@|-|=|%|#|_|~|\+|\$|\*|\|/g;
-      const auxName = fileName.replace(regExp,  " ")
-      const name = auxName.replaceAll("  ", "").trim()
-      this.book.title = name
+    close() {
+      this.book = {};
+      this.file = {};
+      this.progressUpload = 0;
+      this.dialog = false;
+      this.loading = false;
+    },
+    getAuxiliaryName() {
+      if (this.book.name) return;
+      const fileName = getAuxiliaryName(this.file.name);
+      this.book.title = fileName;
     },
     async addAuthor() {
-      if (!this.author.name) this.author.name = "Minha coleção"
-      this.author.name = this.author.name.trim()
-      let author = this.getAuthorByName(this.author.name)
-      if(!author) author = await this.saveAuthor(this.author);
-      return author;
+      const author = this.author;
+      author.name = author.name.trim();
+      author.list = this.list;
+      let newAuthor = this.getAuthorByName(author.name);
+      if (!newAuthor) newAuthor = await this.saveAuthor(author);
+      return newAuthor;
+    },
+    async addFile(book) {
+      const { img, numPages } = await getBookCover(book.file);
+      this.book.totalPages = numPages;
+      await uploadImg({ path: book.path, imgDataURL: img });
+      uploadBook(book).on("state_changed", (state) => {
+        const progress = (state.bytesTransferred / state.totalBytes) * 100;
+        this.progressUpload = progress;
+        if (progress === 100) this.close();
+      });
     },
     async addBook() {
-      this.book.file = this.file;
-      this.book.author = await this.addAuthor();
-      if (this.book.file) {
-        this.book.path = createPath(this.book);
-        const { img, numPages } = await getBookCover(this.book.file);
-        await uploadBook(this.book);
-        await uploadImg({ path: this.book.path, imgDataURL: img });
-        this.book.totalPages = numPages;
+      const book = this.book;
+      const author = this.author;
+      book.file = this.file;
+      book.lastReading = Date.now();
+      if (!author.id) book.author = await this.addAuthor();
+      else book.author = author;
+      if (book.file) {
+        book.path = createPath(book);
+        await this.addFile(book);
       }
       await this.saveBook(this.book); //espera a operação
     },
     async add() {
       this.loading = true;
       await this.addBook();
-      console.log(this.author.name);
-      this.dialog = false;
-      this.loading = false;
     },
   },
 };
 </script>
 
-<style>
+<style scoped>
+#book-new{
+  height: 50px;
+}
 .form-book {
   width: 70%;
 }
 .select-field {
   display: flex;
+}
+.close-button {
+  position: absolute;
+  margin: 5px;
+  top: 0;
+  right: 0;
 }
 </style>
 

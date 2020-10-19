@@ -21,7 +21,7 @@ firebase.initializeApp({
   measurementId: "G-QTXHPGR6R0"
 })
 
-Vue.config.productionTip = false
+Vue.config.productionTip = true
 
 new Vue({
   router,

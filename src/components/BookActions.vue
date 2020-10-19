@@ -122,7 +122,7 @@ export default {
     async remove() {
       this.$emit("loading", true)
       await this.deleteBook(this.book);
-      this.$router.back();
+      this.$router.go({name: "Listas"});
     },
   },
 };

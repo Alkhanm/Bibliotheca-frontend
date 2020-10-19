@@ -1,5 +1,7 @@
 import http from '@/services/api/axios'
 import { AUTHOR } from "@/services/api/url"
+import { deleteArchives } from "@/services/storage"
+
 export default {
     state: {
         arr: [],
@@ -30,11 +32,17 @@ export default {
             commit("addAuthor", newAuthor)
             return newAuthor
         },
-        async deleteAuthor({ commit, dispatch }, author) {
+        async deleteAuthor({ commit, dispatch, rootState }, author) {
             try {
+                //Caminho no storage do livro atual
+                //Pega o caminho para a pasta que contém todos os livros desse autor e a apaga
+                const bookPath = rootState.book.currentBook.path.split("/")
+                const path = bookPath.slice(0, bookPath.length - 1).join("/")
+                if (bookPath.length) await deleteArchives(path)
                 await http.delete(`${AUTHOR.URL}/${author.id}`)
                 commit("removeAuthor", author)
             } catch (err) {
+                console.error(err)
                 dispatch("notify", { ...err, time: 5000 })
             }
         },
@@ -49,7 +57,7 @@ export default {
         getAuthorByName: ({ arr }) => (name) =>
             arr.find(a => {
                 const author = a.name.toUpperCase().trim().replaceAll(" ", "")
-                const authorName = name.toUpperCase().trim().replaceAll(" ", "") 
+                const authorName = name.toUpperCase().trim().replaceAll(" ", "")
                 if (author === authorName) return author
             }),
 

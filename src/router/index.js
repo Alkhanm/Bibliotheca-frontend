@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import Book from '@/components/Book'
-import Author from '@/components/Author'
-import TheMenu from  '@/components/TheMenu.vue'
-import Authentication from '@/components/Authentication.vue'
+const Book = () => import('@/components/Book')
+const Author = () => import('@/components/Author')
+const Authentication = () => import('@/components/Authentication.vue')
+import TheMenu from '@/components/TheMenu.vue'
 
 import { validRouteLogin, validRoutes } from '@/services/validRoutes'
 
@@ -35,7 +35,7 @@ const router = new VueRouter({
       path: '/author/:id',
       name: 'Autor',
       component: Author,
-      props: true
+      props: true,
     },
     {
       path: "*",

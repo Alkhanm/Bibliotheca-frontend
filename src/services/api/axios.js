@@ -26,7 +26,7 @@ function error(e) {
     const statusCode = e.response.status
     if (statusCode === 403 && router.currentRoute.name !== 'Login') {
         store.dispatch("signout")
-        router.push({name: "Login"})
+        router.push({ name: "Login" })
         return Promise.reject(e)
     }
     return Promise.reject(e)

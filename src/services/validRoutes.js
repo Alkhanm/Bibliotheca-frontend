@@ -8,7 +8,7 @@ import {USER_KEY} from "@/services/constants"
 const user = JSON.parse(localStorage.getItem(USER_KEY))
 
 export function validRoutes (to, from, next) {
-    document.title = `Libros - ${to.name}`
+    document.title = `Bibliotheca - ${to.name}`
     if (to.name !== "Login" && !user) next({path: "/auth"})
     else next()
 }

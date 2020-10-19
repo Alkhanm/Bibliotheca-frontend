@@ -2,10 +2,10 @@
   <v-list>
     <v-list-group v-for="author in author" :key="author.id">
       <template v-slot:activator>
-        <v-btn :to="{ name: 'Autor', params: { id: author.id } }" text small class="mr-2">
+        <v-btn :to="{ name: 'Autor', params: { id: author.id } }" text class="mr-2">
           <v-icon>collections_bookmark</v-icon>
         </v-btn>
-        <v-list-item-title v-text="author.name" />
+        <v-list-item-title v-text="author.name" class="text-capitalize" />
       </template>
       <Books :author="author"></Books>
     </v-list-group>
@@ -14,7 +14,7 @@
     </v-list-item>
     <v-list-item v-else-if="!author.length">
       <v-list-item-content>
-        <v-alert text type="info">Nenhum autor adicionado</v-alert>
+        <v-alert text>Nenhum livro adicionado</v-alert>
       </v-list-item-content>
     </v-list-item>
   </v-list>

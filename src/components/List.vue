@@ -2,16 +2,20 @@
   <v-card dark class="mx-auto">
     <v-card-title class="font-weight-regular justify-space-between">
       <span class="text-uppercase">{{ list.name }}</span>
-      <v-menu dark left offset-x>
+      <v-menu left offset-x>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" text>
+          <v-btn text v-bind="attrs" v-on="on">
             <v-icon>menu</v-icon>
           </v-btn>
         </template>
-        <BookNew v-bind="{ list }"></BookNew>
-        <v-btn class="ml-2 mr-2" @click="deleteList(list)" fab small>
-          <v-icon >mdi-delete</v-icon>
-        </v-btn>
+        <v-card dark >
+          <BookNew v-bind="{ list }">
+            <v-btn slot="button-to-open"></v-btn>
+          </BookNew>
+          <v-btn class="ml-1 mr-1" @click="deleteList(list)" text>
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </v-card>
       </v-menu>
     </v-card-title>
     <v-card-subtitle>
@@ -32,7 +36,7 @@
           <div class="text-right">Iniciada em: {{ list.startDate }}</div>
         </v-card-text>
       </v-window-item>
-      <v-window-item :value="2">
+      <v-window-item eager :value="2">
         <v-spacer></v-spacer>
         <Authors :list="list"></Authors>
       </v-window-item>
