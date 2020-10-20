@@ -32,13 +32,14 @@ export default {
             commit("addAuthor", newAuthor)
             return newAuthor
         },
-        async deleteAuthor({ commit, dispatch, rootState }, author) {
+        async deleteAuthor({ dispatch, commit, rootGetters }, author) {
             try {
-                //Caminho no storage do livro atual
                 //Pega o caminho para a pasta que contém todos os livros desse autor e a apaga
-                const bookPath = rootState.book.currentBook.path.split("/")
+                const book = rootGetters.getBooksByAuthor(author).find(book => book.path != null)
+                const bookPath = book.path.split("/") 
+                //Caminho no storage para os livros desse autor
                 const path = bookPath.slice(0, bookPath.length - 1).join("/")
-                if (bookPath.length) await deleteArchives(path)
+                if (bookPath.length) deleteArchives(path)
                 await http.delete(`${AUTHOR.URL}/${author.id}`)
                 commit("removeAuthor", author)
             } catch (err) {
@@ -54,7 +55,7 @@ export default {
         getAuthorById: ({ arr }) => (id) =>
             arr.find(author => author.id === id),
 
-        getAuthorByName: ({ arr }) => (name) =>
+        getAuthorByName: ({ arr }) => (name) => 
             arr.find(a => {
                 const author = a.name.toUpperCase().trim().replaceAll(" ", "")
                 const authorName = name.toUpperCase().trim().replaceAll(" ", "")

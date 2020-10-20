@@ -1,5 +1,5 @@
-<template> 
-  <v-dialog id="book-new" v-model="dialog" persistent max-width="600" >
+<template>
+  <v-dialog id="book-new" v-model="dialog" persistent max-width="600">
     <template v-slot:activator="{ on, attrs }">
       <v-btn text v-bind="attrs" v-on="on">
         <v-icon>book</v-icon>
@@ -57,7 +57,8 @@
           @change="getAuxiliaryName()"
           class="mb-4"
           v-model="file"
-          validate-on-blur
+          type="file"
+          accept="application/pdf"
           show-size
           label="Incluir arquivo"
           :rules="ruleFile"
@@ -89,7 +90,10 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import { getBookCover, getAuxiliaryName } from "@/services/PdfService";
+import {
+  getBookCover,
+  getAuxiliaryName as getNameFrom,
+} from "@/services/PdfService";
 import { uploadBook, uploadImg, createPath } from "@/services/storage";
 
 export default {
@@ -136,23 +140,22 @@ export default {
     ...mapActions(["saveBook", "saveAuthor", "fetchAuthors"]),
     close() {
       this.book = {};
-      this.file = {};
       this.progressUpload = 0;
+      this.file = null;
       this.dialog = false;
       this.loading = false;
     },
     getAuxiliaryName() {
       if (this.book.name) return;
-      const fileName = getAuxiliaryName(this.file.name);
+      const fileName = getNameFrom(this.file.name);
       this.book.title = fileName;
     },
     async addAuthor() {
-      const author = this.author;
-      author.name = author.name.trim();
-      author.list = this.list;
-      let newAuthor = this.getAuthorByName(author.name);
-      if (!newAuthor) newAuthor = await this.saveAuthor(author);
-      return newAuthor;
+      const name = this.author.name.trim() || "Meus livros";
+      const author = this.author.id ? this.author : this.getAuthorByName(name);
+      if (author?.id) return author;
+      const newAuthor = { name, list: this.list };
+      return await this.saveAuthor(newAuthor);
     },
     async addFile(book) {
       const { img, numPages } = await getBookCover(book.file);
@@ -166,16 +169,15 @@ export default {
     },
     async addBook() {
       const book = this.book;
-      const author = this.author;
       book.file = this.file;
       book.lastReading = Date.now();
-      if (!author.id) book.author = await this.addAuthor();
-      else book.author = author;
+      book.author = await this.addAuthor();
       if (book.file) {
         book.path = createPath(book);
         await this.addFile(book);
       }
       await this.saveBook(this.book); //espera a operação
+      if (!book.file) this.close();
     },
     async add() {
       this.loading = true;
@@ -186,7 +188,7 @@ export default {
 </script>
 
 <style scoped>
-#book-new{
+#book-new {
   height: 50px;
 }
 .form-book {

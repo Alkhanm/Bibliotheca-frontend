@@ -34,18 +34,24 @@ export default {
                 dispatch("notify", { ...err, time: 5000 })
             }
         },
-        deleteList({ commit, rootState }, list) {
+        async deleteList({ commit, rootGetters }, list) {
             try {
-                http.delete(`${LIST.URL}/${list.id}`)
+                const authors = rootGetters.getAuthorsByList(list)
+                for (const author of authors) {
+                    const book = rootGetters.getBooksByAuthor(author).find(book => book.path != null)
+                    const bookPath = book.path.split("/")
+                    const path = bookPath.slice(0, bookPath.length - 1).join("/")
+                    if (bookPath.length) deleteArchives(path)
+                }
+                await http.delete(`${LIST.URL}/${list.id}`)
                 commit("deleteList", list)
                 commit("removeAuthorsByList", list)
-                const bookPath = rootState?.book?.currentBook?.path.split("/")
-                const path = bookPath.slice(0, bookPath.length - 1).join("/")
-                if (bookPath.length) deleteArchives(path)
             } catch (err) {
                 console.error(err)
             }
         }
     },
-    getters: {}
+    getters: {
+
+    }
 }

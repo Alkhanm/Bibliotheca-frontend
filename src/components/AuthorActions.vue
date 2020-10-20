@@ -4,6 +4,7 @@
       <v-icon>keyboard_return</v-icon>
     </v-btn>
     <v-spacer></v-spacer>
+    <Confirm :callback="remove"></Confirm>
     <v-menu
       :close-on-content-click="false"
       offset-y
@@ -27,7 +28,7 @@
           </v-list-item>
           <v-list-item>
             <v-list-item-title class="mr-2">Excluir</v-list-item-title>
-            <v-btn @click="remove()" text>
+            <v-btn @click="requestConfirmation(true)" text>
               <v-icon>delete</v-icon>
             </v-btn>
           </v-list-item>
@@ -43,11 +44,13 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 import BookNew from "./BookNew";
+import Confirm from "./Confirm";
+
 export default {
   name: "AuthorActions",
-  components: { BookNew },
+  components: { BookNew, Confirm },
   props: {
     author: {
       type: Object,
@@ -56,14 +59,13 @@ export default {
   },
   data: () => ({}),
   methods: {
+    ...mapMutations(["requestConfirmation"]),
     ...mapActions(["deleteAuthor"]),
     async remove() {
       this.$emit("loading", true)
       await this.deleteAuthor(this.author);
+      this.$router.go({name: "Listas"});
       this.$emit("loading", false)
-      setInterval(() => {
-        this.$router.go({name: "Listas"});
-      }, 2000)
     },
   },
 };

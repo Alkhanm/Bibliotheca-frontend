@@ -43,7 +43,7 @@ export default {
   props: { id: { type: Number, required: false }},
   components: { BookPreview, AuthorActions },
   data: () => ({
-    loading: true,
+    loading: false,
   }),
   computed: {
     ...mapGetters(["getAuthorById", "getBooksByAuthor"]),

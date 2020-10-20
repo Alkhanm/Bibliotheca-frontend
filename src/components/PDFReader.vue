@@ -178,12 +178,13 @@ export default {
       if (document.fullscreenElement) document.exitFullscreen();
     },
     toggleFullscreen() {
-      if (!document.fullscreenElement)
+      if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
-      else this.exitFullscreen();
+        screen.orientation.lock("landscape-primary");
+      } else this.exitFullscreen();
     },
     async close() {
-      await this.exitFullscreen()
+      await this.exitFullscreen();
       this.open = false;
       const book = { ...this.book };
       book.lastReading = Date.now();
@@ -246,7 +247,7 @@ export default {
   width: 100%;
   z-index: 1;
 }
-@media (max-width: 600px) {
+@media (max-width: 500px) {
   .counter {
     display: none;
   }

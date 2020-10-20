@@ -67,7 +67,7 @@ export default {
   name: "Book",
   props: { id: { type: Number, required: false }},
   components: { BookActions, PDFReader },
-  data: () => ({ pdfURL: "", imgURL: "", loading: null }),
+  data: () => ({ pdfURL: "", imgURL: "", loading: false }),
   computed: {
     ...mapGetters(["getBookById"]),
     book() {
@@ -118,8 +118,8 @@ export default {
   methods: {
     ...mapMutations(["openBook"]),
     async getArchives() {
-      this.loading = true;
       try {
+        this.loading = true;
         this.imgURL = await downloadIMG(this.book);
         this.pdfURL = await downloadPDF(this.book);
       } catch (err) {

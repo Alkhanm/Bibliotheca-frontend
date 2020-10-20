@@ -2,7 +2,7 @@ import { storage } from "firebase/app"
 import store from "@/store"
 import formatText from "@/services/replace";
 
-export function createPath(book) { 
+export function createPath(book) {
     const id = store.state.user.id
     const author = book.author
     const list = author.list
@@ -33,8 +33,7 @@ export async function uploadImg({ path, imgDataURL }) {
         console.error("Não foi possivel salvar um imagem deste livro.", err)
     }
 }
-
-export async function downloadIMG({ path }){
+export async function downloadIMG({ path }) {
     try {
         const ref = storage().ref()
         return await ref.child(path + "-img").getDownloadURL()
@@ -43,8 +42,7 @@ export async function downloadIMG({ path }){
         console.error(err)
     }
 }
-
-export async function downloadPDF({ path }){
+export async function downloadPDF({ path }) {
     try {
         const ref = storage().ref()
         return await ref.child(path).getDownloadURL()
@@ -53,7 +51,6 @@ export async function downloadPDF({ path }){
         console.error(err)
     }
 }
-
 export async function downloadBook({ path }) {
     try {
         const URL = {}
@@ -80,9 +77,9 @@ export async function deleteArchives(path) {
         const child = ref.child(path)
         const refs = await child.listAll()
         const items = refs.items
-        items.forEach(async item => {
+        for (const item of items) {
             await ref.child(item.location.path).delete()
-        })
+        }
     } catch (err) {
         console.error("Não foi possivel deletar os arquivos associados.", err)
     }
