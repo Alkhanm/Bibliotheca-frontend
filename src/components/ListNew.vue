@@ -1,25 +1,29 @@
 <template>
-  <v-card dark>
-    <v-card-title>Adicionar uma nova lista</v-card-title>
-    <v-row>
-      <v-col>
+  <v-dialog v-model="dialog" max-width="600" persistent>
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn v-on="on" v-bind="attrs" text>
+        <v-icon>library_add</v-icon>
+      </v-btn>
+    </template>
+    <v-card dark max-height="450">
+      <v-card-title>Adicionar uma nova lista</v-card-title>
+      <v-card-text>
         <v-text-field
+          class="form-input"
           v-model="list.name"
-          class="ml-3"
           autofocus
           label="Nome da lista"
           hint="Informe o nome da nova lista"
         ></v-text-field>
         <v-combobox
-          class="ml-2"
+          class="form-input"
           v-model="list.categories"
           :items="items"
           chips
-          clearable
           label="Categorias (opcional)"
           hint="Após digitar aperte enter para confirmar ou selecione alguma das opções predefinidas."
           multiple
-          prepend-icon="filter_list" >
+        >
           <template v-slot:selection="{ attrs, item, select, selected }">
             <v-chip
               v-bind="attrs"
@@ -28,41 +32,53 @@
               @click="select"
               @click:close="remove(item)"
             >
-              <strong>{{ item }}</strong>&nbsp;
+              <strong>{{ item }}</strong
+              >&nbsp;
               <span>(categoria)</span>
             </v-chip>
           </template>
         </v-combobox>
-      </v-col>
-      <v-col>
-        <div class="ml-2">
-          <v-switch color="info" v-model="addDescription" label="Adicionar descrição"></v-switch>
-        </div>
+        <v-row class="pb-0 mb-0">
+          <v-col class="pa-2" cols="12" sm="6">
+            <v-btn
+              @click="addList()"
+              block
+              color="grey darken-3"
+              :disabled="!list.name"
+            >
+             Salvar
+            </v-btn>
+          </v-col>
+          <v-col class="pa-2" cols="12" sm="6">
+            <v-btn @click="close()" block color="grey darken-3">
+              Fechar
+            </v-btn>
+          </v-col>
+        </v-row>
+        <!--  <v-col class="form-input">
+            <div class="ml-2">
+              <v-switch
+                color="info"
+                v-model="addDescription"
+                label="Adicionar descrição"
+              ></v-switch>
+            </div>
 
-        <div class="mr-2">
-          <v-textarea
-            v-model="list.description"
-            v-show="addDescription"
-            autofocus 
-            auto-grow
-            rows="1"
-            row-height="2"
-          ></v-textarea>
-        </div>
-      </v-col>
-    </v-row>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn @click="addList()" color="grey darken-3" :disabled="!list.name">
-        <v-icon color="info">add</v-icon>Salvar
-      </v-btn>
-      <v-spacer></v-spacer>
-      <v-btn @click="close()" color="grey darken-3">
-        <v-icon color="info">close</v-icon>Fechar
-      </v-btn>
-      <v-spacer></v-spacer>
-    </v-card-actions>
-  </v-card>
+            <div class="mr-2">
+              <v-textarea
+                v-model="list.description"
+                v-show="addDescription"
+                autofocus
+                auto-grow
+                rows="1"
+                label=""
+                row-height="2"
+              ></v-textarea>
+            </div>
+          </v-col> -->
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -71,8 +87,8 @@ export default {
   name: "ListNew",
   data() {
     return {
+      dialog: false,
       list: {},
-      addDescription: false,
       items: [
         "Literatura Clássica",
         "Literatura brasileira",
@@ -89,13 +105,11 @@ export default {
     ...mapActions(["saveList"]),
     async addList() {
       await this.saveList(this.list);
-      this.list = {}
-      this.$store.commit("createList", false);
+      this.close()
     },
     close() {
+      this.dialog = false;
       this.list = {};
-      this.addDescription = false;
-      this.$store.commit("createList", false);
     },
     remove(item) {
       this.list.categories.splice(this.list.categories.indexOf(item), 1);
@@ -110,7 +124,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .new-list-form {
   display: flex;
   flex-direction: row;

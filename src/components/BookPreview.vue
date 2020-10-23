@@ -38,7 +38,8 @@ export default {
   },
   async mounted() {
     this.$emit("loading", true)
-    if (this.book.path) this.img = await downloadIMG(this.book);
+    if (this.book.path) 
+      this.img = await downloadIMG(this.book.path);
     this.loading = false;
     this.$emit("loading", false)
   },

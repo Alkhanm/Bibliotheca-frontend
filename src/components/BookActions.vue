@@ -3,7 +3,6 @@
     <v-btn @click="$router.back()" color="grey darken-3">
       <v-icon>keyboard_return</v-icon>
     </v-btn>
-    <Confirm :callback="remove"></Confirm>
     <v-spacer></v-spacer>
     <v-menu
       :close-on-content-click="false"
@@ -21,18 +20,6 @@
       <v-card id="actions" dark>
         <v-list class="grey darken-3">
           <v-subheader>Opções de leitura</v-subheader>
-          <v-list-item>
-            <v-list-item-title>Ler</v-list-item-title>
-            <v-btn @click="openBook(true)" :disabled="!hasPDF" text>
-              <v-icon title="">menu_book</v-icon>
-            </v-btn>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title class="mr-2">Marcar como lido</v-list-item-title>
-            <v-btn @click="setAsRead()" text>
-              <v-icon title="">library_add_check</v-icon>
-            </v-btn>
-          </v-list-item>
           <v-subheader>Opções do livro</v-subheader>
           <template v-if="!hasPDF">
             <v-list-item>
@@ -59,9 +46,7 @@
           </template>
           <v-list-item>
             <v-list-item-title class="mr-2">Excluir</v-list-item-title>
-            <v-btn @click="requestConfirmation(true)" append text>
-              <v-icon>delete</v-icon>
-            </v-btn>
+            <ConfirmDelete :callback="remove"></ConfirmDelete>
           </v-list-item>
         </v-list>
       </v-card>
@@ -72,14 +57,13 @@
 <script>
 import { uploadBook, uploadImg, createPath } from "@/services/storage";
 import { getBookCover } from "@/services/PdfService";
-import { READING_STATUS as status } from "@/services/enums";
 import { mapMutations, mapActions } from "vuex";
-import Confirm from "./Confirm";
+import ConfirmDelete from "./ConfirmDelete";
 
 export default {
   name: "BookActions",
   props: { book: { type: Object, requerid: true } },
-  components: { Confirm },
+  components: { ConfirmDelete },
   data() {
     return {
       showListChange: false,
@@ -103,23 +87,23 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["deleteBook", "updateBook"]),
+    ...mapActions(["deleteBook", "updateBook", "updateReading"]),
     ...mapMutations(["openBook", "requestConfirmation"]),
-    setAsRead() {
-      this.book.readingStatus = status.COMPLETED;
-      this.updateBook(this.book);
-    },
     async addFile() {
       this.$emit("loading", true);
+      const book = this.book;
+      const reading = book.reading;
       if (this.isValidFile) {
-        this.book.path = createPath(this.book);
+        book.path = createPath(book);
+        console.log(book);
         const { img, numPages } = await getBookCover(this.book.file);
         await uploadBook(this.book);
-        await uploadImg({ path: this.book.path, imgDataURL: img });
-        this.book.totalPages = numPages;
-        await this.updateBook(this.book);
-        this.$emit("addedPDF");
+        await uploadImg({ path: book.path, imgDataURL: img });
+        await this.updateBook(book);
+        await this.updateReading(reading);
+        reading.totalPages = numPages;
       }
+      this.$emit("addedPDF");
       this.$emit("loading", false);
     },
     async remove() {

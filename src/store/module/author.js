@@ -22,29 +22,46 @@ export default {
     },
     actions: {
         async fetchAuthors({ commit }, list) {
-            const response = await http.get(AUTHOR.URL, { params: { list: list.id } })
-            const author = response.data
-            commit("addAllAuthors", author)
-        },
-        async saveAuthor({ commit }, author) {
-            const response = await http.post(AUTHOR.URL, author)
-            const newAuthor = response.data
-            commit("addAuthor", newAuthor)
-            return newAuthor
-        },
-        async deleteAuthor({ dispatch, commit, rootGetters }, author) {
             try {
-                //Pega o caminho para a pasta que contém todos os livros desse autor e a apaga
-                const book = rootGetters.getBooksByAuthor(author).find(book => book.path != null)
-                const bookPath = book.path.split("/") 
-                //Caminho no storage para os livros desse autor
-                const path = bookPath.slice(0, bookPath.length - 1).join("/")
-                if (bookPath.length) deleteArchives(path)
-                await http.delete(`${AUTHOR.URL}/${author.id}`)
-                commit("removeAuthor", author)
+                const response = await http.get(AUTHOR.URL, { params: { list: list.id } })
+                const author = response.data
+                commit("addAllAuthors", author)
+            }
+            catch (err) {
+                console.error(err)
+                commit("inform", err.response.data)
+            }
+        },
+        async saveAuthor({ commit, getters }, author) {
+            const authors = getters.getAuthorsByList(author.list)
+            const exists = authors
+                .some(a => a.name.toUpperCase() === author.name.toUpperCase())
+            if (exists) return commit("inform",
+                { message: "Essa coleção já possui um livro de mesmo titulo", type: "warning" })
+            try {
+                const response = await http.post(AUTHOR.URL, author)
+                const newAuthor = response.data
+                commit("addAuthor", newAuthor)
+                return newAuthor
             } catch (err) {
                 console.error(err)
-                dispatch("notify", { ...err, time: 5000 })
+                commit("inform", err.response.data)
+            }
+        },
+        async deleteAuthor({ commit, rootGetters }, author) {
+            try {
+                await http.delete(`${AUTHOR.URL}/${author.id}`)
+                commit("removeAuthor", author)
+                //Pega o caminho para a pasta que contém todos os livros desse autor e a apaga
+                const book = rootGetters.getBooksByAuthor(author).find(book => book.path != null)
+                if (!book) return;
+                const bookPath = book.path.split("/")
+                //Caminho no storage para os livros desse autor
+                const path = bookPath.slice(0, bookPath.length - 1).join("/")
+                deleteArchives(path)
+            } catch (err) {
+                console.error(err)
+                commit("inform", err.response.data)
             }
         },
     },
@@ -55,7 +72,7 @@ export default {
         getAuthorById: ({ arr }) => (id) =>
             arr.find(author => author.id === id),
 
-        getAuthorByName: ({ arr }) => (name) => 
+        getAuthorByName: ({ arr }) => (name) =>
             arr.find(a => {
                 const author = a.name.toUpperCase().trim().replaceAll(" ", "")
                 const authorName = name.toUpperCase().trim().replaceAll(" ", "")

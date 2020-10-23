@@ -17,7 +17,7 @@ function success(s) {
 }
 function error(e) {
     if (!e.response) {
-        store.dispatch('notify', {
+        store.commit('inform', {
             message: "Erro de conexão. O servidor não está respondendo. Aguarde.",
             type: "error"
         })

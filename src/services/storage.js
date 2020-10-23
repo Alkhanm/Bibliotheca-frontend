@@ -11,47 +11,46 @@ export function createPath(book) {
         .toLowerCase();
     return path;
 }
-
-export function uploadBook({ path, file }) {
+export function uploadBook(path, file) {
     try {
         const ref = storage().ref()
         const child = ref.child(path)
         return child.put(file)
     } catch (err) {
-        store.dispatch("notify", { ...err, message: "Erro ao fazer upload do arquivo", time: 4000, type: "warning" })
+        store.commit("inform", { ...err, message: "Erro ao fazer upload do arquivo", time: 4000, type: "warning" })
         console.error(err)
     }
 }
-export async function uploadImg({ path, imgDataURL }) {
+export async function uploadImg(path, img) {
     try {
         const ref = storage().ref()
         const child = ref.child(path + "-img")
-        const dataUrl = imgDataURL.split(",")[1]
+        const dataUrl = img.split(",")[1]
         await child.putString(dataUrl, "base64", { contentType: 'image/jpeg' })
     } catch (err) {
-        store.dispatch("notify", { ...err, message: "Erro ao fazer upload do arquivo", time: 4000, type: "warning" })
+        store.commit("inform", { ...err, message: "Erro ao fazer upload do arquivo", time: 4000, type: "warning" })
         console.error("Não foi possivel salvar um imagem deste livro.", err)
     }
 }
-export async function downloadIMG({ path }) {
+export async function downloadIMG(path) {
     try {
         const ref = storage().ref()
         return await ref.child(path + "-img").getDownloadURL()
     } catch (err) {
-        store.dispatch("notify", { ...err, message: "Erro ao fazer download da imagem", time: 4000, type: "warning" })
+        store.commit("inform", { ...err, message: "Erro ao fazer download da imagem", time: 4000, type: "warning" })
         console.error(err)
     }
 }
-export async function downloadPDF({ path }) {
+export async function downloadPDF(path) {
     try {
         const ref = storage().ref()
         return await ref.child(path).getDownloadURL()
     } catch (err) {
-        store.dispatch("notify", { ...err, message: "Erro ao fazer download do PDF", time: 4000, type: "warning" })
+        store.commit("inform", { ...err, message: "Erro ao fazer download do PDF", time: 4000, type: "warning" })
         console.error(err)
     }
 }
-export async function downloadBook({ path }) {
+export async function downloadBook(path) {
     try {
         const URL = {}
         const ref = storage().ref()
@@ -59,7 +58,7 @@ export async function downloadBook({ path }) {
         URL.img = await ref.child(path + "-img").getDownloadURL()
         return URL
     } catch (err) {
-        store.dispatch("notify", { ...err, message: "Erro ao fazer download do arquivo", time: 4000, type: "warning" })
+        store.commit("inform", { ...err, message: "Erro ao fazer download do arquivo", time: 4000, type: "warning" })
         console.error(err)
     }
 }

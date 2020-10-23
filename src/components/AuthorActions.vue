@@ -4,7 +4,7 @@
       <v-icon>keyboard_return</v-icon>
     </v-btn>
     <v-spacer></v-spacer>
-    <Confirm :callback="remove"></Confirm>
+    <ConfirmDelete :callback="remove"></ConfirmDelete>
     <v-menu
       :close-on-content-click="false"
       offset-y
@@ -28,9 +28,7 @@
           </v-list-item>
           <v-list-item>
             <v-list-item-title class="mr-2">Excluir</v-list-item-title>
-            <v-btn @click="requestConfirmation(true)" text>
-              <v-icon>delete</v-icon>
-            </v-btn>
+            <ConfirmDelete :callback="remove"></ConfirmDelete>
           </v-list-item>
           <v-subheader>Opções dos livros</v-subheader>
           <v-list-item>
@@ -46,18 +44,17 @@
 <script>
 import { mapActions, mapMutations } from "vuex";
 import BookNew from "./BookNew";
-import Confirm from "./Confirm";
+import ConfirmDelete from "./ConfirmDelete";
 
 export default {
   name: "AuthorActions",
-  components: { BookNew, Confirm },
+  components: { BookNew, ConfirmDelete },
   props: {
     author: {
       type: Object,
       requerid: true,
     },
   },
-  data: () => ({}),
   methods: {
     ...mapMutations(["requestConfirmation"]),
     ...mapActions(["deleteAuthor"]),

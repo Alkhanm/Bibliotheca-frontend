@@ -15,7 +15,8 @@ export default new Vuex.Store({
   state: {
     showMenu: false,
     showConfirmation: false,
-    info: '',
+    fullScreen: false,
+    info: "",
   },
   mutations,
   actions,

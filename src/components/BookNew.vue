@@ -8,8 +8,8 @@
     <v-card dark class="grey darken-4" max-height="450">
       <v-progress-linear
         height="13"
-        color="success"
-        background-opacity="0.5"
+        color="info"
+        background-opacity="0.7"
         :buffer-value="progressUpload"
       ></v-progress-linear>
       <v-card-title>
@@ -27,12 +27,15 @@
       <v-card-text>
         <v-text-field
           v-model="book.title"
+          :rules="ruleTitle"
           autofocus
           label="Título"
           hint="Adicione o título do novo livro aqui."
           persistent-hint
           clearable
           class="mb-5"
+          :error="hasBook"
+          :error-messages="hasBook ? 'Esse livro já foi salvo' : ''"
         />
         <template v-if="!author.id">
           <v-text-field
@@ -112,9 +115,19 @@ export default {
     return {
       dialog: false,
       loading: false,
+      message: "",
       progressUpload: 0,
-      book: {},
       file: null,
+      book: {
+        title: "",
+        reading: { lastReading: Date.now() },
+        author: {},
+      },
+      ruleTitle: [
+        () =>
+          (!this.loading && !this.hasBook) ||
+          "Um livro de mesmo nome já existe nesta coleção.",
+      ],
       ruleFile: [
         (v) =>
           (!!v && v.type === "application/pdf") ||
@@ -126,9 +139,20 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getAuthorByName", "getAuthorsByList"]),
+    ...mapGetters(["getAuthorByName", "getAuthorsByList", "getBooksByAuthor"]),
+    hasBook() {
+      const author = this.getAuthorByName(this.author.name) || {};
+      const books = this.getBooksByAuthor(author);
+      const exists = books.some(
+        (b) =>
+          b.title.trim().toUpperCase() === this.book.title.trim().toUpperCase()
+      );
+      return exists;
+    },
     isValid() {
-      if (this.file && this.file.type !== "application/pdf") return false;
+      const file = this.file;
+      if ((file && file.type !== "application/pdf") || this.hasBook)
+        return false;
       return !!this.book.title;
     },
     authors() {
@@ -137,13 +161,17 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["saveBook", "saveAuthor", "fetchAuthors"]),
+    ...mapActions(["saveBook", "saveAuthor"]),
     close() {
-      this.book = {};
       this.progressUpload = 0;
-      this.file = null;
       this.dialog = false;
       this.loading = false;
+      this.book = {
+        title: "",
+        file: null,
+        reading: { lastReading: Date.now() },
+        author: {},
+      };
     },
     getAuxiliaryName() {
       if (this.book.name) return;
@@ -151,33 +179,37 @@ export default {
       this.book.title = fileName;
     },
     async addAuthor() {
-      const name = this.author.name.trim() || "Meus livros";
+      const name = this.author.name.trim() || `Meus livros (${this.list.name})`;
       const author = this.author.id ? this.author : this.getAuthorByName(name);
-      if (author?.id) return author;
+      if (author.id) return author;
       const newAuthor = { name, list: this.list };
       return await this.saveAuthor(newAuthor);
     },
-    async addFile(book) {
-      const { img, numPages } = await getBookCover(book.file);
-      this.book.totalPages = numPages;
-      await uploadImg({ path: book.path, imgDataURL: img });
-      uploadBook(book).on("state_changed", (state) => {
+    async saveImg(){
+      const { img, numPages } = await getBookCover(this.file);
+      await uploadImg(this.book.path, img);
+      this.book.reading.totalPages = numPages;
+    },
+    savePdf() {
+      const file = this.file
+      const path = this.book.path
+      uploadBook(path, file).on("state_changed", (state) => {
         const progress = (state.bytesTransferred / state.totalBytes) * 100;
         this.progressUpload = progress;
-        if (progress === 100) this.close();
+        if (progress >= 100) this.close()
       });
     },
     async addBook() {
       const book = this.book;
-      book.file = this.file;
-      book.lastReading = Date.now();
       book.author = await this.addAuthor();
-      if (book.file) {
+      if (this.file) {
         book.path = createPath(book);
-        await this.addFile(book);
+        await this.saveImg();
+        await this.saveBook(book);
+        return this.savePdf();
       }
-      await this.saveBook(this.book); //espera a operação
-      if (!book.file) this.close();
+      await this.saveBook(this.book);
+      this.close()
     },
     async add() {
       this.loading = true;

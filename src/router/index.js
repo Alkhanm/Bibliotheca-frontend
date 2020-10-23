@@ -8,7 +8,7 @@ import TheMenu from '@/components/TheMenu.vue'
 
 import { validRouteLogin, validRoutes } from '@/services/validRoutes'
 
-Vue.use(VueRouter) 
+Vue.use(VueRouter)
 
 const router = new VueRouter({
   mode: 'history',
@@ -39,7 +39,7 @@ const router = new VueRouter({
     },
     {
       path: "*",
-      redirect:"/menu"
+      redirect: "/menu"
     }
   ]
 })

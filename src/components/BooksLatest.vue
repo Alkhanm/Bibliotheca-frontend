@@ -1,12 +1,13 @@
 <template>
   <div id="book-latest">
     <v-card
+      v-if="currentBook.path"
       :loading="!img"
       :to="{ name: 'Leitura', params: { id: currentBook.id } }"
       class="mx-auto"
       max-width="60"
     >
-      <v-img :src="img" />
+      <v-img lazy-src="../assets/test-img_.jpg" width="60" :src="img" />
     </v-card>
   </div>
 </template>
@@ -17,17 +18,16 @@ import { downloadIMG } from "@/services/storage";
 export default {
   data: () => ({ img: "" }),
   computed: {
-    currentBook(){
-      return this.$store.state.book.currentBook
-    }
+    currentBook() {
+      const book = this.$store.state.book.currentBook;
+      return book;
+    },
   },
-  methods: {
-    ...mapActions(["fetchLastBook"]),
-  },
+  methods: mapActions(["fetchLastBook"]),
   async mounted() {
     await this.fetchLastBook();
-    if (this.currentBook.path) 
-      this.img = await downloadIMG(this.currentBook);
+    if (this.currentBook.path)
+      this.img = await downloadIMG(this.currentBook.path);
   },
 };
 </script>

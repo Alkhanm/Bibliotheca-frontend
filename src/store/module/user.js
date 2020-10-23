@@ -1,5 +1,5 @@
 import http from '@/services/api/axios'
-import {USER} from "@/services/api/url"
+import { USER } from "@/services/api/url"
 
 export default {
     state: {
@@ -9,26 +9,27 @@ export default {
         token: ""
     },
     mutations: {
-        addUser(state, { id, username, email, token}){ 
+        addUser(state, { id, username, email, token }) {
             state.id = id,
-            state.username = username,
-            state.email = email,
-            state.token = token 
+                state.username = username,
+                state.email = email,
+                state.token = token
         }
     },
     actions: {
-        async saveUser({commit, dispatch}, user){
-            try {  
+        async saveUser({ commit }, user) {
+            try {
                 const response = await http.post(USER.URL, user)
                 const newUser = response.data
                 commit("addUser", newUser)
                 return true
-            } catch(err){
-                dispatch("notify", {...err.response.data, time: 5000})
-          }
+            } catch (err) {
+                console.error(err)
+                commit("inform", err.response.data)
+            }
         }
     },
-    getters:{
+    getters: {
         getUsername(state) { return state.username }
     }
 }

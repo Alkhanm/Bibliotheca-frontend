@@ -11,10 +11,10 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <h3 class="text-capitalize">{{ getUsername }}</h3>
+      <h3 class="text-capitalize mr-3">{{ getUsername }}</h3>
 
-      <v-btn icon @click="signout()">
-        <v-icon>mdi-export</v-icon>
+      <v-btn small icon @click="signout()">
+        <v-icon>input</v-icon> 
       </v-btn>
     </v-toolbar>
   </div>
@@ -23,7 +23,11 @@
 import { mapMutations, mapActions, mapGetters } from "vuex";
 export default {
   name: "TheHeader",
-  props: ["page"],
+  data: () => ({
+    icons: {
+      logout : "src/assets/input.svg"
+    }
+  }),
   computed: {
     ...mapGetters(["getUsername"]),
     menuIsVisible() {

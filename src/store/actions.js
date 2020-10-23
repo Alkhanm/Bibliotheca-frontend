@@ -3,7 +3,7 @@ import { AUTH } from "@/services/api/url"
 import { USER_KEY } from '@/services/constants'
 import router from "@/router/index"
 
-async function signin({ commit, dispatch }, payload) {
+async function signin({ commit }, payload) {
     try {
         const response = await http.post(AUTH.LOGIN, payload)
         const user = response.data
@@ -12,7 +12,7 @@ async function signin({ commit, dispatch }, payload) {
         commit('displayMenu', true)
         router.go({ name: "Listas" })
     } catch (err) {
-        dispatch("notify", { ...err.response.data, type: "error", time: 4000 })
+        commit("inform", { ...err.response.data, type: "error" })
     }
 }
 function signout({ commit }) {
@@ -21,16 +21,7 @@ function signout({ commit }) {
     commit('pullLists', [])
     router.go({ name: "Login" })
 }
-function notify({ commit }, info) {
-    commit('inform', info)
-    if (info.time) {
-        const time = setInterval(() => {
-            commit("inform", '')
-            clearInterval(time)
-        }, info.time)
-    }
-}
 
-export { signin, signout, notify }
+export { signin, signout }
 
 

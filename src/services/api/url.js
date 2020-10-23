@@ -17,6 +17,8 @@ const AUTHOR = {
 }
 const BOOK = {
     URL: "/books",
-    FETCH_BY_AUTHOR: "/books/author",
 }
-export { BASE, AUTH, BOOK, AUTHOR, USER, LIST }
+const READING = {
+    URL: "/readings"
+}
+export { BASE, AUTH, USER, LIST, AUTHOR, BOOK, READING }

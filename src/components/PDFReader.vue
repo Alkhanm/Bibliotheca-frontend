@@ -12,10 +12,11 @@
         v-bind="attrs"
         v-on="on"
         :src="imgURL"
-        class="image-book"
+        class="image"
         max-width="30%"
       />
     </template>
+
     <v-card dark class="mx-auto" :loading="loading">
       <span v-if="loading" class="load-button">
         <v-btn class="ma-2" fab loading></v-btn>
@@ -51,13 +52,13 @@
             min="1"
             thumb-size="26"
             thumb-label="always"
-            :max="book.totalPages"
+            :max="reading.totalPages"
           >
           </v-slider>
           <v-btn @click="next()">
             <v-icon>navigate_next</v-icon>
           </v-btn>
-          <span class="mt-5">{{ `${pageNum}/${book.totalPages}` }}</span>
+          <span class="mt-5">{{ `${pageNum}/${reading.totalPages}` }}</span>
           <v-btn @click="toggleFullscreen()" class="full-screen-bottom">
             <v-icon>aspect_ratio</v-icon>
           </v-btn>
@@ -78,7 +79,7 @@ import { renderPDF, renderPage } from "@/services/PdfService";
 export default {
   name: "PDFReader",
   props: {
-    book: { type: Object, required: true },
+    reading: { type: Object, required: true },
     pdfURL: { type: String, required: true },
     imgURL: { type: String, required: true },
   },
@@ -87,22 +88,26 @@ export default {
       pdf: {},
       showOptions: false,
       slider: 0,
-      scale: 2.7,
+      scale: 0,
       pageNum: 0,
       loading: true,
       pageRendering: false,
       firstTouch: "",
       showBottom: true,
       open: false,
+      orientation: window.screen.orientation
     };
   },
   computed: {
     isSmallDevice() {
       return window.screen.height / window.devicePixelRatio < 500;
     },
+    openInFullScreen(){
+      return this.$store.state.fullScreen;
+    }
   },
   methods: {
-    ...mapActions(["updateBook"]),
+    ...mapActions(["updateReading"]),
     ...mapMutations(["openBook"]),
     increase() {
       this.scale = this.scale + 0.55;
@@ -116,7 +121,7 @@ export default {
       if (this.pageNum > 1 && !this.pageRendering) this.pageNum--;
     },
     next() {
-      if (this.pageNum < this.book.totalPages && !this.pageRendering)
+      if (this.pageNum < this.reading.totalPages && !this.pageRendering)
         this.pageNum++;
     },
     movePageOnTouch(event) {
@@ -138,7 +143,9 @@ export default {
     async getPage(num) {
       try {
         this.pageRendering = true;
-        await renderPage(this.pdf, num, "the-canvas", this.scale);
+        await renderPage(this.pdf, num, this.scale, "the-canvas");
+        const canvas = document.getElementById("the-canvas");
+        canvas.scrollIntoView({ inline: "center" });
       } catch (err) {
         console.error(err);
       } finally {
@@ -148,7 +155,8 @@ export default {
     async prepareReading() {
       try {
         this.pdf = await renderPDF(this.pdfURL);
-        this.slider = this.pageNum = this.book.currentPage;
+        this.scale = this.reading.zoom;
+        this.slider = this.pageNum = this.reading.page;
       } catch (err) {
         console.error(err);
       } finally {
@@ -174,32 +182,35 @@ export default {
       );
       if (top !== topMax) this.showBottom = value;
     },
-    async exitFullscreen() {
-      if (document.fullscreenElement) document.exitFullscreen();
+    exitFullscreen() {
+      if (!this.openInFullScreen && document.fullscreenElement) document.exitFullscreen();
+      screen.orientation.lock(this.orientation.type);
     },
     toggleFullscreen() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
-        screen.orientation.lock("landscape-primary");
       } else this.exitFullscreen();
+      screen.orientation.lock("landscape-primary");
     },
-    async close() {
-      await this.exitFullscreen();
+    async update() {
+      const reading = { ...this.reading };
+      reading.lastReading = Date.now();
+      reading.page = this.pageNum;
+      reading.zoom = this.scale;
+      await this.updateReading(reading);
+    },
+    close() {
       this.open = false;
-      const book = { ...this.book };
-      book.lastReading = Date.now();
-      book.currentPage = this.pageNum;
-      this.updateBook(book);
+      this.exitFullscreen();
+      this.update();
     },
   },
   watch: {
-    async pageNum(value) {
+    async pageNum(newValue) {
       if (!this.pageRendering) {
-        const canvas = document.getElementById("the-canvas");
-        canvas.scrollIntoView({ inline: "center" });
         this.showBottom = true;
-        await this.getPage(value);
-        this.slider = value;
+        this.slider = newValue;
+        await this.getPage(newValue);
       }
     },
   },
@@ -237,7 +248,7 @@ export default {
   display: flex;
   width: 100%;
 }
-.image-book {
+.image {
   cursor: pointer;
 }
 .load-button {

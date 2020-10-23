@@ -1,25 +1,19 @@
 <template>
-  <v-card dark class="mx-auto">
-    <!-- Componente que pede confirmações do usuário antes de excutar alguma ação definitiva -->
-    <Confirm :callback="remove"></Confirm>
-    <v-card-title class="font-weight-regular justify-space-between">
-      <span class="text-uppercase">{{ list.name }}</span>
-      <v-menu left offset-x>
+  <v-card dark class="mx-auto" rounded="15%">
+    <v-card-text class="text-uppercase list-title pa-md-4 mx-lg-auto">
+      <h3 class="title white--text">{{ list.name }}</h3>
+      <v-menu class="menu pa-0 mt-0" left offset-x>
         <template v-slot:activator="{ on, attrs }">
           <v-btn text v-bind="attrs" v-on="on">
-            <v-icon>menu</v-icon>
+            <v-icon>more_horiz</v-icon>
           </v-btn>
         </template>
-        <v-card dark>
-          <BookNew v-bind="{ list }">
-            <v-btn slot="button-to-open"></v-btn>
-          </BookNew>
-          <v-btn class="ml-1 mr-1" @click="requestConfirmation(true)" text>
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
+        <v-card class="mr-2" dark>
+          <BookNew v-bind="{ list }"></BookNew>
+          <ConfirmDelete :callback="remove"></ConfirmDelete>
         </v-card>
       </v-menu>
-    </v-card-title>
+    </v-card-text>
     <v-card-subtitle>
       <v-chip
         v-for="(cat, i) in categories"
@@ -61,12 +55,12 @@
 <script>
 import Authors from "@/components/Authors";
 import BookNew from "./BookNew";
-import Confirm from "./Confirm";
+import ConfirmDelete from "./ConfirmDelete";
 import { mapActions, mapMutations } from "vuex";
 
 export default {
-  name: "Section",
-  components: { Authors, BookNew, Confirm },
+  name: "List",
+  components: { Authors, BookNew, ConfirmDelete },
   props: { list: { type: Object, requerid: true } },
   data: () => ({
     showActionsPanel: false,
@@ -90,9 +84,18 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 .actions-list {
   display: flex;
   flex-direction: row;
+}
+.list-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+}
+.title {
+  flex: 1;
+  width: auto;
 }
 </style>
