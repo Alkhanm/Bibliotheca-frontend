@@ -62,13 +62,3 @@
     opacity: 0;
     transform: translateY(56px);
 }
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 1s;
-}
-
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
-}

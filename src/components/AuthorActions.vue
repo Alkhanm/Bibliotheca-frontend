@@ -4,7 +4,6 @@
       <v-icon>keyboard_return</v-icon>
     </v-btn>
     <v-spacer></v-spacer>
-    <ConfirmDelete :callback="remove"></ConfirmDelete>
     <v-menu
       :close-on-content-click="false"
       offset-y
@@ -20,10 +19,10 @@
       <v-card id="actions" dark>
         <v-list class="grey darken-3">
           <v-subheader>Opções do autor</v-subheader>
-          <v-list-item>
+          <v-list-item disabled>
             <v-list-item-title>Mudar de lista</v-list-item-title>
             <v-btn text>
-              <v-icon title="">create</v-icon>
+              <v-icon>create</v-icon>
             </v-btn>
           </v-list-item>
           <v-list-item>

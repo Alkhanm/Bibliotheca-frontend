@@ -12,7 +12,7 @@
         v-bind="attrs"
         v-on="on"
         :src="imgURL"
-        class="image"
+        class="image-book"
         max-width="30%"
       />
     </template>

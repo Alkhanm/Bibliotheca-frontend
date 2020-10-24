@@ -3,11 +3,13 @@
     <TheHeader />
     <v-main id="app-main">
       <v-container fluid>
-        <router-view></router-view>
+        <transition name="bounce" mode="out-in" appear>
+          <router-view></router-view>
+        </transition>
       </v-container>
     </v-main>
     <div v-show="info.message" id="alert-info">
-      <v-card dark class="ma-2" width="80%" max-width="350" >
+      <v-card dark class="ma-2 grey darken-3" width="80%" max-width="350" >
         <v-card-text class="text-center" id="alert-content">
           <v-icon :color="info.type">{{ info.type }}</v-icon>
           <div class="alert-text mt-2 pl-2 text-start">{{ info.message }}</div>

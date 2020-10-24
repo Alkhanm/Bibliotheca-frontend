@@ -6,27 +6,26 @@
     max-width="1000"
     :loading="loading"
   >
-    <v-card-title>
-      <span>
-        <span class="text-capitalize">{{ book.title }} </span>
-        [{{ statusName }} ]
-        <v-progress-linear
-          v-if="hasPDF"
-          :value="statusValue"
-          striped
-          height="10px"
-          :color="statusColor"
-        >
-        </v-progress-linear>
-      </span>
-    </v-card-title>
-    <v-card-subtitle class="text-capitalize pt-2">
+    <v-progress-linear
+      v-if="hasPDF"
+      :value="statusValue"
+      striped
+      height="10px"
+      :color="statusColor"
+    >
+    </v-progress-linear>
+    <v-card-text class="ma-0 pa-0">
+      <h3 class="title text-capitalize white--text">
+        {{ book.title }}
+        <span :style="`color: ${statusColor}`">[{{ statusName }}]</span>
+      </h3>
       <v-chip
+        class="mb-2"
         :to="{ name: 'Autor', params: { id: book.author.id } }"
         outlined
         >{{ book.author.name }}</v-chip
       >
-    </v-card-subtitle>
+    </v-card-text>
 
     <v-divider></v-divider>
 
@@ -63,7 +62,6 @@
 </template>
 
 <script>
-//import { READING_STATUS } from "@/services/enums";
 import { mapGetters, mapMutations } from "vuex";
 import { downloadPDF, downloadIMG } from "@/services/storage";
 import BookActions from "./BookActions";
@@ -94,16 +92,16 @@ export default {
       return last.toLocaleString().split(" ").reverse().join(" ");
     },
     statusColor() {
-      return this.statusValue === 100 ? "success": "info"
+      return this.statusValue === 100 ? "#4CAF50" : "#1E88E5";
     },
     statusValue() {
       const { page, totalPages } = this.book.reading;
-      const readingPercentage =  (page / totalPages) * 100;
-      const value = this.statusName === status.COMPLETED ? 100 : readingPercentage;
-      return value;
+      const readingPercentage = (page / totalPages) * 100;
+      return readingPercentage;
     },
     statusName() {
-      return this.book.reading.status;
+      const status = this.book.reading.status;
+      return status;
     },
     hasPDF() {
       return !!this.book.path;

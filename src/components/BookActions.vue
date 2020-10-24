@@ -20,7 +20,19 @@
       <v-card id="actions" dark>
         <v-list class="grey darken-3">
           <v-subheader>Opções de leitura</v-subheader>
+          <v-list-item disabled>
+            <v-list-item-title class="mr-2">Status da Leitura</v-list-item-title>
+            <v-btn text>
+              <v-icon>notes</v-icon>
+            </v-btn>
+          </v-list-item>
           <v-subheader>Opções do livro</v-subheader>
+          <v-list-item disabled>
+            <v-list-item-title class="mr-2"> Alterar titulo </v-list-item-title>
+            <v-btn text>
+              <v-icon>edit</v-icon>
+            </v-btn>
+          </v-list-item>
           <template v-if="!hasPDF">
             <v-list-item>
               <v-list-item-title class="mr-2">
