@@ -46,13 +46,11 @@
               color="grey darken-3"
               :disabled="!list.name"
             >
-             Salvar
+              Salvar
             </v-btn>
           </v-col>
           <v-col class="pa-2" cols="12" sm="6">
-            <v-btn @click="close()" block color="grey darken-3">
-              Fechar
-            </v-btn>
+            <v-btn @click="close()" block color="grey darken-3"> Fechar </v-btn>
           </v-col>
         </v-row>
         <!--  <v-col class="form-input">
@@ -105,7 +103,7 @@ export default {
     ...mapActions(["saveList"]),
     async addList() {
       await this.saveList(this.list);
-      this.close()
+      this.close();
     },
     close() {
       this.dialog = false;
@@ -128,13 +126,5 @@ export default {
 .new-list-form {
   display: flex;
   flex-direction: row;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 1s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>

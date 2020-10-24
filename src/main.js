@@ -6,8 +6,9 @@ import router from './router/index'
 import store from './store/index'
 import vuetify from './plugins/vuetify';
 
-import firebase from 'firebase/app'
+import "./assets/style.css";
 
+import firebase from 'firebase/app'
 import 'firebase/storage'
 
 firebase.initializeApp({

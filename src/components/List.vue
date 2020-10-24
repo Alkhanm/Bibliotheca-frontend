@@ -1,7 +1,7 @@
 <template>
   <v-card dark class="mx-auto" rounded="15%">
-    <v-card-text class="text-uppercase list-title pa-md-4 mx-lg-auto">
-      <h3 class="title white--text">{{ list.name }}</h3>
+    <v-card-text class="text-uppercase list-text">
+      <h4 class="title white--text">{{ list.name }}</h4>
       <v-menu class="menu pa-0 mt-0" left offset-x>
         <template v-slot:activator="{ on, attrs }">
           <v-btn text v-bind="attrs" v-on="on">
@@ -89,13 +89,9 @@ export default {
   display: flex;
   flex-direction: row;
 }
-.list-title {
+.list-text {
   display: flex;
   justify-content: space-between;
   align-items: stretch;
-}
-.title {
-  flex: 1;
-  width: auto;
 }
 </style>

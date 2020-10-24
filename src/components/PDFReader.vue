@@ -95,16 +95,16 @@ export default {
       firstTouch: "",
       showBottom: true,
       open: false,
-      orientation: window.screen.orientation
+      orientation: window.screen.orientation,
     };
   },
   computed: {
     isSmallDevice() {
       return window.screen.height / window.devicePixelRatio < 500;
     },
-    openInFullScreen(){
+    openInFullScreen() {
       return this.$store.state.fullScreen;
-    }
+    },
   },
   methods: {
     ...mapActions(["updateReading"]),
@@ -183,7 +183,8 @@ export default {
       if (top !== topMax) this.showBottom = value;
     },
     exitFullscreen() {
-      if (!this.openInFullScreen && document.fullscreenElement) document.exitFullscreen();
+      if (!this.openInFullScreen && document.fullscreenElement)
+        document.exitFullscreen();
       screen.orientation.lock(this.orientation.type);
     },
     toggleFullscreen() {
@@ -222,42 +223,30 @@ export default {
 
 <style scoped>
 #bottom {
-  display: flex;
-  height: 56px;
-  width: 100%;
-  position: fixed;
-  background-color: #2e2e2e;
-  bottom: 0;
-  z-index: 4;
-  justify-content: space-between;
+    display: flex;
+    height: 56px;
+    width: 100%;
+    position: fixed;
+    background-color: #2e2e2e;
+    bottom: 0;
+    z-index: 4;
+    justify-content: space-between;
 }
 
 #bottom button {
-  height: 100%;
-  background-color: transparent;
-  box-shadow: none;
+    height: 100%;
+    background-color: transparent;
+    box-shadow: none;
 }
 
 .space {
-  width: 15%;
+    width: 15%;
 }
+
 #space-between {
-  height: 56px;
+    height: 56px;
 }
-.page-count {
-  display: flex;
-  width: 100%;
-}
-.image {
-  cursor: pointer;
-}
-.load-button {
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  width: 100%;
-  z-index: 1;
-}
+
 @media (max-width: 500px) {
   .counter {
     display: none;
@@ -271,14 +260,4 @@ export default {
     display: none;
   }
 }
-.up-enter-active,
-.up-leave-active {
-  transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
-  transition-timing-function: cubic-bezier(0.25, 0.8, 0.5, 1);
-}
-.up-enter,
-.up-leave-to {
-  opacity: 0;
-  transform: translateY(56px);
-}
-</style> >
+</style>

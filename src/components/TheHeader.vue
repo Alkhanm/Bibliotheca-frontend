@@ -40,17 +40,3 @@ export default {
   },
 };
 </script>
-<style>
-.title {
-  user-select: none;
-}
-.title:hover {
-  cursor: pointer;
-  opacity: 0.9;
-}
-
-.header-card {
-  display: flex;
-  flex-direction: column;
-}
-</style>

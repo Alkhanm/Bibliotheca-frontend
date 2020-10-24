@@ -46,6 +46,9 @@ export default {
 </script>
 
 <style scoped>
+#app {
+  background-image: linear-gradient(to top, rgb(145, 137, 137), rgba(47, 48, 51, 0.726));
+}
 #alert-info {
   position: fixed;
   bottom: 0;

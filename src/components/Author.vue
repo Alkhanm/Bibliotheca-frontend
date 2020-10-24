@@ -62,7 +62,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .books-container {
   display: flex;
   justify-content: space-evenly;

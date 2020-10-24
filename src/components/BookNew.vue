@@ -115,6 +115,7 @@ export default {
     return {
       dialog: false,
       loading: false,
+      error: false,
       message: "",
       progressUpload: 0,
       file: null,
@@ -166,9 +167,10 @@ export default {
       this.progressUpload = 0;
       this.dialog = false;
       this.loading = false;
+      this.error = false;
+      this.file = null;
       this.book = {
         title: "",
-        file: null,
         reading: { lastReading: Date.now() },
         author: {},
       };
@@ -181,35 +183,39 @@ export default {
     async addAuthor() {
       const name = this.author.name.trim() || `Meus livros (${this.list.name})`;
       const author = this.author.id ? this.author : this.getAuthorByName(name);
-      if (author.id) return author;
+      if (author?.id) return author;
       const newAuthor = { name, list: this.list };
       return await this.saveAuthor(newAuthor);
     },
-    async saveImg(){
+    async saveImg() {
       const { img, numPages } = await getBookCover(this.file);
       await uploadImg(this.book.path, img);
       this.book.reading.totalPages = numPages;
     },
-    savePdf() {
-      const file = this.file
-      const path = this.book.path
+    async savePdf() {
+      const file = this.file;
+      const path = this.book.path;
       uploadBook(path, file).on("state_changed", (state) => {
         const progress = (state.bytesTransferred / state.totalBytes) * 100;
         this.progressUpload = progress;
-        if (progress >= 100) this.close()
+        if (progress >= 100) this.close();
       });
     },
     async addBook() {
       const book = this.book;
-      book.author = await this.addAuthor();
-      if (this.file) {
+      try {
+        book.author = await this.addAuthor();
+        if (!this.file) return this.saveBook(this.book);
         book.path = createPath(book);
         await this.saveImg();
-        await this.saveBook(book);
-        return this.savePdf();
+        this.saveBook(book);
+        this.savePdf();
+      } catch (err) {
+        this.error = true;
+        console.error(err);
+      } finally {
+        this.close();
       }
-      await this.saveBook(this.book);
-      this.close()
     },
     async add() {
       this.loading = true;

@@ -160,17 +160,3 @@ export default {
   },
 };
 </script>
-
-<style>
-#menu-action {
-  position: fixed;
-  z-index: 4;
-}
-.top-menu {
-  display: flex;
-}
-.flip-list-move {
-  transition: transform 1s;
-}
-</style>
-

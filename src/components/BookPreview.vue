@@ -1,10 +1,8 @@
 <template>
   <v-card id="book-preview" dark width="300" class="mb-3">
-    <v-card-title>
-      <p class="text-capitalize">{{ book.title }}</p>
-    </v-card-title>
-    <v-divider></v-divider>
     <v-card-text @click="toBook()" class="pa-4 image-book">
+      <h5 class="title text-capitalize">{{ book.title }}</h5>
+      <v-divider></v-divider>
       <v-btn v-if="loading" loading block text></v-btn>
       <v-img contain v-else-if="img" class="ma-2" :src="img" />
       <span class="text-center no-image-text" v-else>
@@ -50,15 +48,5 @@ export default {
 #book-preview {
   display: flex;
   flex-direction: column;
-}
-.image-book{
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.image-book:hover{
-  cursor: pointer;
 }
 </style>

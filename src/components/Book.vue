@@ -130,7 +130,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #content {
   display: flex;
   justify-content: space-between;
@@ -140,11 +140,5 @@ export default {
 }
 #text-about-book {
   flex: 1;
-}
-.image-book {
-  cursor: pointer;
-}
-.progress-reading {
-  color: #ffab40;
 }
 </style>

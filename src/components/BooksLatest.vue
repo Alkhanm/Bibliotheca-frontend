@@ -7,7 +7,7 @@
       class="mx-auto"
       max-width="60"
     >
-      <v-img lazy-src="../assets/test-img_.jpg" width="60" :src="img" />
+      <v-img lazy-src="../assets/img/test-img_.jpg" width="60" :src="img" />
     </v-card>
   </div>
 </template>
@@ -31,7 +31,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 #book-latest {
   cursor: pointer;
   right: 0;
